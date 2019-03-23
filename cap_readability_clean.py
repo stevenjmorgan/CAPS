@@ -363,7 +363,10 @@ for j in range(0, len(files)): #len(files)
                 cite_list_source = [e.replace('(', '').replace(')', '') for e in cite_list_source]
                 cite_list_source = list(set(cite_list_source))
                 cite_list_source = [a for a in cite_list_source if len(a.split()) < 7]
-                cite_list_regex = [re.compile(elem) for elem in cite_list_source]
+                try:
+                    cite_list_regex = [re.compile(elem) for elem in cite_list_source]
+                except:
+                    pass
                 
                 sentences = lexnlp.nlp.en.segments.sentences.get_sentence_list(data['casebody']['data']['opinions'][0]['text'].strip())
                 
