@@ -9,7 +9,9 @@ library(ggplot2)
 library(stats)
 library(reshape2)
 
-all_cases <- read.csv('state_court_cases.csv')
+all_cases <- read.csv('state_court_cases_no_cites_50min.csv') #state_court_cases.csv
+
+setwd("C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Min50")
 
 # Subset data to only include readability measures
 keep.vars <- c('ari','coleman_liau', 'flesch', 'flesch_kincaid', 'gunning_fog',
@@ -107,16 +109,16 @@ state_decade_1f <- aggregate(all_cases_factors[,c('Factor1','Factor2', "Comp.1",
                                                   "Comp.2", "RC1", "RC2", 'ari',
                                                   'coleman_liau', 'flesch',
                                                   'flesch_kincaid', 'smog',
-                                                  'gunning_fog', 'word_count',
-                                                  'SCOTUS_cites', 'total_cites',
-                                                  'us_cites')], 
+                                                  'gunning_fog', 'word_count')], 
+                                                  #'SCOTUS_cites', 'total_cites',
+                                                  #us_cites')], 
                              list(all_cases_factors$state, all_cases_factors$decade), mean)
 colnames(state_decade_1f) <- c('state','decade','average_1f','average_2f', 
                                'average_pc1','average_pc2', 'average_rc1',
                                'average_rc2', 'average_ari', 'average_coleman',
                                'average_flesch', 'average_fk', 'average_smog',
-                               'average_gf','average_word_count', 'average_scotus',
-                               'average_total_cite', 'average_us_cites')
+                               'average_gf','average_word_count')#, 'average_scotus',
+                               #'average_total_cite', 'average_us_cites')
 state_decade_1f <- state_decade_1f[with(state_decade_1f, order(state, decade)),]
 
 ### Plot average factor score by decade by state
@@ -237,13 +239,13 @@ dev.off()
 read.by.year <- aggregate(all_cases_factors[,c('ari', 'coleman_liau', 'flesch',
                                                'flesch_kincaid', 'smog',
                                                'gunning_fog', 'word_count',
-                                               'SCOTUS_cites', 'us_cites',
-                                               'total_cites')], 
+                                               'SCOTUS_cites')],#, 'us_cites',
+                                               #'total_cites')], 
                              list(all_cases_factors$state, all_cases_factors$year), mean)
 colnames(read.by.year) <- c('state','year', 'average_ari', 'average_coleman',
                                'average_flesch', 'average_fk', 'average_smog',
-                               'average_gf', 'average_wc', 'average_scotus',
-                            'average_us', 'average_total_cites')
+                               'average_gf', 'average_wc')#, 'average_scotus',
+                            #'average_us', 'average_total_cites')
 read.by.year <- read.by.year[with(read.by.year, order(state, year)),]
 pdf('average_read_year.pdf')
 for (i in 1:length(states)) {
