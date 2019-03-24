@@ -22,6 +22,7 @@ from datetime import datetime
 import json
 #import numpy as np 
 import pandas as pd
+import numpy as np
 import re
 import os
 import glob
@@ -341,6 +342,9 @@ for j in range(0, 1): #len(files)
         court_d = {}
         for line in f:
         
+            #if case_id == 10:
+            #    break
+            
             data = json.loads(line)
             
             if (data['court']['name'] in state_high_list) and len(data['casebody']['data']['opinions']) > 0: #and len(data['casebody']['data']['opinions'][0]['text'].split()) > 50:
@@ -369,6 +373,7 @@ for j in range(0, 1): #len(files)
                 # Extract citations in generator object, store in list
                 cite_gen = lexnlp.extract.en.citations.get_citations(data['casebody']['data']['opinions'][0]['text'], return_source=True, as_dict=True)
                 cite_list = list(cite_gen)
+                cite_list = [a for a in cite_list if len(a.split()) < 7]
                 
                 # Count # of citations
                 gen_count = len(cite_list)
@@ -397,14 +402,14 @@ for j in range(0, 1): #len(files)
                         cite_names = cite_names + ', ' + cite_list[el]['citation_str']
                         
                 # Create list of citation names, Make a regex that matches if any of our regexes match.
-                cite_list_source = [d['citation_str'] for d in cite_list]
-                cite_list_source = [e.replace('(', '').replace(')', '') for e in cite_list_source]
-                cite_list_source = list(set(cite_list_source))
-                cite_list_source = [a for a in cite_list_source if len(a.split()) < 7]
-                try:
-                    cite_list_regex = [re.compile(elem) for elem in cite_list_source]
-                except:
-                    pass
+#                cite_list_source = [d['citation_str'] for d in cite_list]
+#                cite_list_source = [e.replace('(', '').replace(')', '') for e in cite_list_source]
+#                cite_list_source = list(set(cite_list_source))
+#                cite_list_source = [a for a in cite_list_source if len(a.split()) < 7]
+#                try:
+#                    cite_list_regex = [re.compile(elem) for elem in cite_list_source]
+#                except:
+#                    pass
                 
                 # Sentence parser
 #                sentences = lexnlp.nlp.en.segments.sentences.get_sentence_list(data['casebody']['data']['opinions'][0]['text'].strip())
@@ -426,6 +431,8 @@ for j in range(0, 1): #len(files)
                 
                     # Create row for each citation
                     for el in cite_list:
+                        
+                        court_d = {}
                         
                         cite_names = el['citation_str']
                         reporter = el['reporter_full_name']
@@ -457,6 +464,9 @@ for j in range(0, 1): #len(files)
                         rows_list.append(court_d)
                         
                 else:
+                    
+                    court_d = {}
+                    
                     court_d.update(case_id = case_id,
                                    court = data['court']['name'], 
                                    date = data['decision_date'], 
@@ -506,10 +516,14 @@ for j in range(0, 1): #len(files)
             
         state_court_d[states[j]] = pd.DataFrame(rows_list)
         state_court_d[states[j]] = state_court_d[states[j]][columns] # Rearrange columns
-        state_court_d_wide[states[j]] = state_court_d[states[j]].groupby(['case_id', 'court','date','cite','case','year', 'decade', 
+        
+        state_court_d_wide[states[j]] = state_court_d[states[j]].fillna(-999).groupby(['case_id', 'court','date','cite','case','year', 'decade', 
            'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
            'coleman_liau', 'state', 'word_count', 'pos_cites', 'neg_cites', #'number_cites', 
-           'has_opinion', 'total_opins', 'greater50', 'opin_author', 'judges']).mean()
+           'has_opinion', 'total_opins', 'greater50', 'opin_author', 'judges'], as_index=False).mean() #opin_author, judges
+        #state_court_d_wide[states[j]] = state_court_d_wide[states[j]][columns]
+        
+        state_court_d_wide[states[j]] = state_court_d_wide[states[j]].replace(-999, np.NaN)
         
         t2 = datetime.now()
         print(state + ': ' + str(t2-t1))
@@ -532,14 +546,14 @@ states_single_df = pd.concat(state_court_d.values(), ignore_index=True)
 states_single_df.to_csv('state_court_long_final.csv', index = False)
 
 # Convert from wide to long (one case per row)
-states_single_df_wide = pd.concat(state_court_d_wide.values(), ignore_index=True)
+states_single_df_wide = pd.concat(state_court_d_wide.values(), ignore_index=True, sort=False)
 #states_single_df_wide = states_single_df.groupby(['case_id', 'court','date','cite','case','year', 'decade', 
 #           'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
 #           'coleman_liau', 'state', 'word_count', 'pos_cites', 'neg_cites', #'number_cites', 
 #           'has_opinion', 'total_opins', 'greater50', 'opin_author', 'judges']).mean()
 with open('df_wide_final.pkl', 'wb') as handle:
     pickle.dump(states_single_df_wide, handle, protocol=pickle.HIGHEST_PROTOCOL)
-states_single_df_wide.to_csv('state_court_wide_final.csv', index = True)
+states_single_df_wide.to_csv('state_court_wide_final.csv', index = False)
 
 
 exit()
