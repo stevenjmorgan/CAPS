@@ -342,8 +342,8 @@ for j in range(0, 1): #len(files)
         court_d = {}
         for line in f:
         
-            #if case_id == 10:
-            #    break
+            if case_id == 100:
+                break
             
             data = json.loads(line)
             
@@ -373,7 +373,6 @@ for j in range(0, 1): #len(files)
                 # Extract citations in generator object, store in list
                 cite_gen = lexnlp.extract.en.citations.get_citations(data['casebody']['data']['opinions'][0]['text'], return_source=True, as_dict=True)
                 cite_list = list(cite_gen)
-                cite_list = [a for a in cite_list if len(a.split()) < 7]
                 
                 # Count # of citations
                 gen_count = len(cite_list)
@@ -402,30 +401,30 @@ for j in range(0, 1): #len(files)
                         cite_names = cite_names + ', ' + cite_list[el]['citation_str']
                         
                 # Create list of citation names, Make a regex that matches if any of our regexes match.
-#                cite_list_source = [d['citation_str'] for d in cite_list]
-#                cite_list_source = [e.replace('(', '').replace(')', '') for e in cite_list_source]
-#                cite_list_source = list(set(cite_list_source))
-#                cite_list_source = [a for a in cite_list_source if len(a.split()) < 7]
-#                try:
-#                    cite_list_regex = [re.compile(elem) for elem in cite_list_source]
-#                except:
-#                    pass
+                cite_list_source = [d['citation_str'] for d in cite_list]
+                cite_list_source = [e.replace('(', '').replace(')', '') for e in cite_list_source]
+                cite_list_source = list(set(cite_list_source))
+                cite_list_source = [a for a in cite_list_source if len(a.split()) < 7]
+                try:
+                    cite_list_regex = [re.compile(elem) for elem in cite_list_source]
+                except:
+                    pass
                 
                 # Sentence parser
-#                sentences = lexnlp.nlp.en.segments.sentences.get_sentence_list(data['casebody']['data']['opinions'][0]['text'].strip())
+                sentences = lexnlp.nlp.en.segments.sentences.get_sentence_list(data['casebody']['data']['opinions'][0]['text'].strip())
                  
                 pos_cite = 0
                 neg_cite = 0
                 
-#                for index, line in enumerate(sentences):
-#                    if any(regex.match(line) for regex in cite_list_regex):
-#                        #print(sentences[index-1])
-#                        sentiment = analyzer.polarity_scores(sentences[index-1])
-#                        #print(sentiment)
-#                        if sentiment['compound'] > 0.05:
-#                            pos_cite += 1
-#                        if sentiment['compound'] > -0.05:
-#                            neg_cite += 1
+                for index, line in enumerate(sentences):
+                    if any(regex.match(line) for regex in cite_list_regex):
+                        #print(sentences[index-1])
+                        sentiment = analyzer.polarity_scores(sentences[index-1])
+                        #print(sentiment)
+                        if sentiment['compound'] > 0.05:
+                            pos_cite += 1
+                        if sentiment['compound'] > -0.05:
+                            neg_cite += 1
                 
                 if gen_count > 0:
                 
