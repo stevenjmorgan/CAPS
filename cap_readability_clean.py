@@ -331,7 +331,7 @@ case_year = ''
 case_decade = 0
 case_id = 0
 analyzer = SentimentIntensityAnalyzer() # Vader sentiment analysis
-for j in range(0, 1): #len(files)
+for j in range(0, len(files)): #len(files)
     
     rows_list = []
     t1 = datetime.now()
@@ -342,8 +342,8 @@ for j in range(0, 1): #len(files)
         court_d = {}
         for line in f:
         
-            if case_id == 100:
-                break
+            #if case_id == 100:
+            #    break
             
             data = json.loads(line)
             
