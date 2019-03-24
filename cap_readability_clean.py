@@ -310,12 +310,16 @@ state_high_list = ['Alabama Supreme Court','Alaska Supreme Court',
 ### Read in data into list of dictionaries
 # Create dictionary of dataframes for each file
 state_court_d = {}
-columns = ['court','date','cite','case','SCOTUS_cites', 'year', 'decade', 
+state_court_d_wide = {}
+columns = ['case_id', 'court','date','cite','case','year', 'decade', 
            'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
            'coleman_liau', 'state', 'word_count', 'number_cites', 'citations',
-           'pos_cites', 'neg_cites']
+           'pos_cites', 'neg_cites', 'has_opinion', 'total_opins', 'greater50',
+           'opin_author', 'judges']
 for name in states:
     state_court_d[name] = pd.DataFrame(columns=columns)
+    state_court_d_wide[name] = pd.DataFrame(columns=columns)
+
 
 # Loop through each file in dir, for each entry create pd.series, append to df
 #scotus_pat = "\d{1,3}\sS\.Ct\.\s"
@@ -324,8 +328,10 @@ for name in states:
 #num_scotus_cites = 0
 case_year = ''
 case_decade = 0
-analyzer = SentimentIntensityAnalyzer()
-for j in range(0, len(files)): #len(files)
+case_id = 0
+analyzer = SentimentIntensityAnalyzer() # Vader sentiment analysis
+for j in range(0, 1): #len(files)
+    
     rows_list = []
     t1 = datetime.now()
     
@@ -337,21 +343,53 @@ for j in range(0, len(files)): #len(files)
         
             data = json.loads(line)
             
-            if (data['court']['name'] in state_high_list) and len(data['casebody']['data']['opinions']) > 0 and len(data['casebody']['data']['opinions'][0]['text'].split()) > 50:
+            if (data['court']['name'] in state_high_list) and len(data['casebody']['data']['opinions']) > 0: #and len(data['casebody']['data']['opinions'][0]['text'].split()) > 50:
                 
                 court_d = {}
                 
+                # Store case year and decade
                 case_year = data['decision_date'][0:4]
                 case_decade = round_down(case_year)
                 
-                #text_clean = data['casebody']['data']['opinions'][0]['text'].replace('(\d+)\s(.+?)\s(\d+)', '')
+                # Remove citations, calculate readability
+                text_clean = data['casebody']['data']['opinions'][0]['text'].replace('(\d+)\s(.+?)\s(\d+)', '')
+                flesch = textstat.flesch_reading_ease(text_clean)
+                flesch_kincaid = textstat.flesch_kincaid_grade(text_clean)
+                fog = textstat.gunning_fog(text_clean)
+                smog = textstat.smog_index(text_clean)
+                ari = textstat.automated_readability_index(text_clean)
+                coleman_liau = textstat.coleman_liau_index(text_clean)
                 
+                # Count words, published opinions, extract state
+                w_count = len(data['casebody']['data']['opinions'][0]['text'].split())
+                total_opins = len(data['casebody']['data']['opinions'])
+                state = states[j].split('_data')[0].replace('_', ' ').capitalize()
+                greater50 = 1 if w_count > 50 else 0
+                
+                # Extract citations in generator object, store in list
                 cite_gen = lexnlp.extract.en.citations.get_citations(data['casebody']['data']['opinions'][0]['text'], return_source=True, as_dict=True)
                 cite_list = list(cite_gen)
                 
+                # Count # of citations
                 gen_count = len(cite_list)
                 cite_names = ''
                 
+                # Opinion author
+                try:
+                    opin_author = data['casebody']['data']['opinions'][0]['author']
+                except:
+                    opin_author = ''
+                    pass
+                
+                # Judges
+                try:
+                    #judges = str(data['casebody']['data']['judges'])
+                    judges = ''.join(data['casebody']['data']['judges'])
+                except:
+                    judges = ''
+                    pass
+                
+                # Create regex's based on extracted citations
                 for el in range(0, len(cite_list)):
                     if el == 0:
                         cite_names = cite_list[el]['citation_str']
@@ -368,59 +406,140 @@ for j in range(0, len(files)): #len(files)
                 except:
                     pass
                 
-                sentences = lexnlp.nlp.en.segments.sentences.get_sentence_list(data['casebody']['data']['opinions'][0]['text'].strip())
-                
+                # Sentence parser
+#                sentences = lexnlp.nlp.en.segments.sentences.get_sentence_list(data['casebody']['data']['opinions'][0]['text'].strip())
+                 
                 pos_cite = 0
                 neg_cite = 0
                 
-                for index, line in enumerate(sentences):
-                    if any(regex.match(line) for regex in cite_list_regex):
-                        #print(sentences[index-1])
-                        sentiment = analyzer.polarity_scores(sentences[index-1])
-                        #print(sentiment)
-                        if sentiment['compound'] > 0.05:
-                            pos_cite += 1
-                        if sentiment['compound'] > -0.05:
-                            neg_cite += 1
+#                for index, line in enumerate(sentences):
+#                    if any(regex.match(line) for regex in cite_list_regex):
+#                        #print(sentences[index-1])
+#                        sentiment = analyzer.polarity_scores(sentences[index-1])
+#                        #print(sentiment)
+#                        if sentiment['compound'] > 0.05:
+#                            pos_cite += 1
+#                        if sentiment['compound'] > -0.05:
+#                            neg_cite += 1
                 
-                court_d.update(court = data['court']['name'], 
-                               date = data['decision_date'], 
-                               cite = data['citations'][0]['cite'], 
-                               case = data['name'], 
-                               ###SCOTUS_cites = num_scotus_cites, 
-                               year = case_year, decade = case_decade,
-                               citations = cite_names,
-                               number_cites = gen_count,
-                               pos_cites = pos_cite, neg_cites = neg_cite)
-                               #flesch = textstat.flesch_reading_ease(text_clean),
-                               #flesch_kincaid = textstat.flesch_kincaid_grade(text_clean),
-                               #gunning_fog = textstat.gunning_fog(text_clean),
-                               #smog = textstat.smog_index(text_clean),
-                               #ari = textstat.automated_readability_index(text_clean),
-                               #coleman_liau = textstat.coleman_liau_index(text_clean),
-                               #state = states[j].split('_data')[0].replace('_', ' ').capitalize(),#,
-                               #word_count = len(data['casebody']['data']['opinions'][0]['text'].split()))
-                               ###us_cites = num_us_cites,
-                               ###total_cites = num_total_cites)
-                rows_list.append(court_d)
-        state_court_d[states[j]] = pd.DataFrame(rows_list)
-        t2 = datetime.now()
-        print(t2-t1)
-
+                if gen_count > 0:
+                
+                    # Create row for each citation
+                    for el in cite_list:
+                        
+                        cite_names = el['citation_str']
+                        reporter = el['reporter_full_name']
+                    
+                        court_d.update(case_id = case_id,
+                                       court = data['court']['name'], 
+                                       date = data['decision_date'], 
+                                       cite = data['citations'][0]['cite'], 
+                                       case = data['name'], 
+                                       ###SCOTUS_cites = num_scotus_cites, 
+                                       year = case_year, decade = case_decade,
+                                       citations = cite_names,
+                                       reporter = reporter,
+                                       number_cites = gen_count,
+                                       pos_cites = pos_cite, neg_cites = neg_cite,
+                                       flesch = flesch,
+                                       flesch_kincaid = flesch_kincaid,
+                                       gunning_fog = fog,
+                                       smog = smog,
+                                       ari = ari,
+                                       coleman_liau = coleman_liau,
+                                       state = state,
+                                       word_count = w_count,
+                                       has_opinion = 1,
+                                       total_opins = total_opins,
+                                       greater50 = greater50,
+                                       opin_author = opin_author,
+                                       judges = judges)
+                        rows_list.append(court_d)
+                        
+                else:
+                    court_d.update(case_id = case_id,
+                                   court = data['court']['name'], 
+                                   date = data['decision_date'], 
+                                   cite = data['citations'][0]['cite'], 
+                                   case = data['name'], 
+                                   ###SCOTUS_cites = num_scotus_cites, 
+                                   year = case_year, decade = case_decade,
+                                   #citations = cite_names,
+                                   #reporter = reporter,
+                                   number_cites = gen_count,
+                                   flesch = flesch,
+                                   flesch_kincaid = flesch_kincaid,
+                                   gunning_fog = fog,
+                                   smog = smog,
+                                   ari = ari,
+                                   coleman_liau = coleman_liau,
+                                   state = state,
+                                   word_count = w_count,
+                                   has_opinion = 1,
+                                   total_opins = total_opins,
+                                   greater50 = greater50,
+                                   opin_author = opin_author,
+                                   judges = judges)
+                    rows_list.append(court_d)
+                
+                case_id += 1
+             
+        if (data['court']['name'] in state_high_list) and len(data['casebody']['data']['opinions']) == 0:
+                
+            court_d = {}
             
+            case_year = data['decision_date'][0:4]
+            case_decade = round_down(case_year)
+        
+            court_d.update(case_id = case_id,
+                           court = data['court']['name'], 
+                           date = data['decision_date'], 
+                           cite = data['citations'][0]['cite'], 
+                           case = data['name'], 
+                           year = case_year, decade = case_decade,
+                           state = state,
+                           has_opinion = 0)
+            rows_list.append(court_d)
+                
+            case_id += 1
+            
+            
+        state_court_d[states[j]] = pd.DataFrame(rows_list)
+        state_court_d[states[j]] = state_court_d[states[j]][columns] # Rearrange columns
+        state_court_d_wide[states[j]] = state_court_d[states[j]].groupby(['case_id', 'court','date','cite','case','year', 'decade', 
+           'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
+           'coleman_liau', 'state', 'word_count', 'pos_cites', 'neg_cites', #'number_cites', 
+           'has_opinion', 'total_opins', 'greater50', 'opin_author', 'judges']).mean()
+        
+        t2 = datetime.now()
+        print(state + ': ' + str(t2-t1))
+
+
+# Dimension check: (62235, 10)
+#state_court_d[states[0]].shape
+#state_court_d[states[0]].head(100).to_csv('sample.csv', index = False)
 #state_court_d['alabama_data']['citations'][1000:1003]
 #state_court_d['alabama_data']['number_cites'][1000:1003]
 #state_court_d['alabama_data']['citations'][1001]
-     
-with open('df_cites_readability_improved_cites.pkl', 'wb') as handle:
+
+
+with open('df_long_final.pkl', 'wb') as handle:
     pickle.dump(state_court_d, handle, protocol=pickle.HIGHEST_PROTOCOL)
-#state_court_d = pd.read_pickle('df_cites_readability_2_6.pkl')
+#state_court_d = pd.read_pickle('df_long_final.pkl')
 
-
-# Convert dictionary of df's to single df, write to .csv
+# Convert dictionary of df's to single df, write to .csv (long: one case-citation per line)
 states_single_df = pd.concat(state_court_d.values(), ignore_index=True)
-states_single_df.to_csv('state_court_cases_improved_cites.csv', index = False)
+states_single_df.to_csv('state_court_long_final.csv', index = False)
 
+# Convert from wide to long (one case per row)
+states_single_df_wide = pd.concat(state_court_d_wide.values(), ignore_index=True)
+#states_single_df_wide = states_single_df.groupby(['case_id', 'court','date','cite','case','year', 'decade', 
+#           'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
+#           'coleman_liau', 'state', 'word_count', 'pos_cites', 'neg_cites', #'number_cites', 
+#           'has_opinion', 'total_opins', 'greater50', 'opin_author', 'judges']).mean()
+with open('df_wide_final.pkl', 'wb') as handle:
+    pickle.dump(states_single_df_wide, handle, protocol=pickle.HIGHEST_PROTOCOL)
+states_single_df_wide.to_csv('state_court_wide_final.csv', index = True)
 
 
 exit()
