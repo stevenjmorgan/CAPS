@@ -191,8 +191,8 @@ def dale_chall_readability_score(text):
     return legacy_round(raw_score, 2)  #score
 
 # Set working directory
-os.chdir('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/')
-#os.chdir('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/')
+#os.chdir('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/')
+os.chdir('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/')
  
 ###############################################################################
 # Read in data into list first (inconsistent graph structure in .jsonl files)
@@ -205,10 +205,10 @@ os.chdir('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/')
 #t2 = datetime.now()
 #print(t2-t1)
 
-files = list(glob.glob(os.path.join('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data/','*.*')))
-#files = list(glob.glob(os.path.join('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data/','*.*')))
-states = [x.split('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data')[1] for x in files]
-#states = [x.split('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data')[1] for x in files]
+#files = list(glob.glob(os.path.join('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data/','*.*')))
+files = list(glob.glob(os.path.join('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data/','*.*')))
+#states = [x.split('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data')[1] for x in files]
+states = [x.split('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data')[1] for x in files]
 states = [x.replace("\\", "") for x in states]
 states = [x.replace(".jsonl", "") for x in states]
  
@@ -536,13 +536,13 @@ for j in range(0, len(files)): #len(files)
 #state_court_d['alabama_data']['citations'][1001]
 
 
-with open('df_long_final.pkl', 'wb') as handle:
+with open('df_long_final3-25.pkl', 'wb') as handle:
     pickle.dump(state_court_d, handle, protocol=pickle.HIGHEST_PROTOCOL)
 #state_court_d = pd.read_pickle('df_long_final.pkl')
 
 # Convert dictionary of df's to single df, write to .csv (long: one case-citation per line)
 states_single_df = pd.concat(state_court_d.values(), ignore_index=True)
-states_single_df.to_csv('state_court_long_final.csv', index = False)
+states_single_df.to_csv('state_court_long_final3-25.csv', index = False)
 
 # Convert from wide to long (one case per row)
 states_single_df_wide = pd.concat(state_court_d_wide.values(), ignore_index=True, sort=False)
@@ -550,9 +550,9 @@ states_single_df_wide = pd.concat(state_court_d_wide.values(), ignore_index=True
 #           'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
 #           'coleman_liau', 'state', 'word_count', 'pos_cites', 'neg_cites', #'number_cites', 
 #           'has_opinion', 'total_opins', 'greater50', 'opin_author', 'judges']).mean()
-with open('df_wide_final.pkl', 'wb') as handle:
+with open('df_wide_final3-25.pkl', 'wb') as handle:
     pickle.dump(states_single_df_wide, handle, protocol=pickle.HIGHEST_PROTOCOL)
-states_single_df_wide.to_csv('state_court_wide_final.csv', index = False)
+states_single_df_wide.to_csv('state_court_wide_final3-25.csv', index = False)
 
 
 exit()
