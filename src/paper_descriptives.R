@@ -62,3 +62,9 @@ group.state %>%
         axis.ticks.y=element_blank()) +
   labs(fill = "Total Cases")
 ggsave('cases_state_al_hi.png')
+
+# Group cases by state since 1950
+wide.1950 <- wide[which(wide$year >= 1950),]
+group.state.1950 <- wide.1950 %>% group_by(region) %>%
+  summarise(trues = n())
+colnames(group.state.1950)[colnames(group.state.1950) == 'trues'] <- 'total.cases'

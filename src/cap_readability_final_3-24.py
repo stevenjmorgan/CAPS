@@ -229,10 +229,10 @@ states = [x.replace(".jsonl", "") for x in states]
 #                 break
 #     print(findName.state_court.unique())
 #     
-# # Faster
+ # Faster
 #courts = []
 #x = 0
-#with open(files[40]) as f:
+#with open(files[29]) as f:
 #    #for line in f:
 #    #    data.append(json.loads(line))
 #    #court_d = {}
@@ -242,6 +242,10 @@ states = [x.replace(".jsonl", "") for x in states]
 #        #if data['court']['name'] == 'Court of Appeals of Maryland':
 #        #    x += 1
 #courts_uni = list(set(courts))
+#print(courts_uni)
+#with open('nj.txt', 'w') as f:
+#    for item in courts_uni:
+#        f.write("%s\n" % item)
 #print(x)
 # =============================================================================
 
@@ -279,6 +283,7 @@ state_high_list = ['Alabama Supreme Court','Alaska Supreme Court',
                    'New Hampshire Supreme Court', 
                    'New Hampshire Committee of the Privy Council', 
                    'New Jersey Supreme Court', 
+                   'Supreme Court of New Jersey',
                    'New Jersey Court of Errors and Appeals',
                    'Supreme Court of New Mexico', 
                    'Supreme Court of North Carolina', 
