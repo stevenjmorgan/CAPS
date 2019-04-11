@@ -214,7 +214,7 @@ states = [x.replace(".jsonl", "") for x in states]
  
 ### Determine what CAPS says state court name is...runs for a while
 # =============================================================================
-# for i in range(19, 20): #len(files)
+# for i in range(41, 42): #len(files)
 #     data1 = []
 #     x = 0
 #     findName = pd.DataFrame(columns = ['state_court'])
@@ -230,19 +230,19 @@ states = [x.replace(".jsonl", "") for x in states]
 #     print(findName.state_court.unique())
 #     
 # # Faster
-# courts = []
-# x = 0
-# with open(files[19]) as f:
-#     #for line in f:
-#     #    data.append(json.loads(line))
-#     #court_d = {}
-#     for line in f:
-#         data = json.loads(line)
-#         courts.append(data['court']['name'])
-#         if data['court']['name'] == 'Court of Appeals of Maryland':
-#             x += 1
-# courts_uni = list(set(courts))
-# print(x)
+#courts = []
+#x = 0
+#with open(files[40]) as f:
+#    #for line in f:
+#    #    data.append(json.loads(line))
+#    #court_d = {}
+#    for line in f:
+#        data = json.loads(line)
+#        courts.append(data['court']['name'])
+#        #if data['court']['name'] == 'Court of Appeals of Maryland':
+#        #    x += 1
+#courts_uni = list(set(courts))
+#print(x)
 # =============================================================================
 
 
@@ -299,6 +299,8 @@ state_high_list = ['Alabama Supreme Court','Alaska Supreme Court',
                    'Constitutional Court of South Carolina',
                    'South Carolina Court of Errors', 
                    'South Carolina Supreme Court', 'Tennessee Supreme Court',
+                   'Texas Supreme Court', 'Texas Courts of Appeals',
+                   'Texas Court of Appeals', 'South Dakota Supreme Court',
                    'Supreme Court of Errors and Appeals of Tennessee',
                    'Utah Supreme Court', 'Vermont Supreme Court',
                    'Supreme Court of Appeals of Virginia',
@@ -393,38 +395,38 @@ for j in range(0, len(files)): #len(files)
                     judges = ''
                     pass
                 
-                # Create regex's based on extracted citations
-                for el in range(0, len(cite_list)):
-                    if el == 0:
-                        cite_names = cite_list[el]['citation_str']
-                    else:
-                        cite_names = cite_names + ', ' + cite_list[el]['citation_str']
-                        
-                # Create list of citation names, Make a regex that matches if any of our regexes match.
-                cite_list_source = [d['citation_str'] for d in cite_list]
-                cite_list_source = [e.replace('(', '').replace(')', '') for e in cite_list_source]
-                cite_list_source = list(set(cite_list_source))
-                cite_list_source = [a for a in cite_list_source if len(a.split()) < 7]
-                try:
-                    cite_list_regex = [re.compile(elem) for elem in cite_list_source]
-                except:
-                    pass
+#                # Create regex's based on extracted citations
+#                for el in range(0, len(cite_list)):
+#                    if el == 0:
+#                        cite_names = cite_list[el]['citation_str']
+#                    else:
+#                        cite_names = cite_names + ', ' + cite_list[el]['citation_str']
+#                        
+#                # Create list of citation names, Make a regex that matches if any of our regexes match.
+#                cite_list_source = [d['citation_str'] for d in cite_list]
+#                cite_list_source = [e.replace('(', '').replace(')', '') for e in cite_list_source]
+#                cite_list_source = list(set(cite_list_source))
+#                cite_list_source = [a for a in cite_list_source if len(a.split()) < 7]
+#                try:
+#                    cite_list_regex = [re.compile(elem) for elem in cite_list_source]
+#                except:
+#                    pass
                 
                 # Sentence parser
-                sentences = lexnlp.nlp.en.segments.sentences.get_sentence_list(data['casebody']['data']['opinions'][0]['text'].strip())
+                #sentences = lexnlp.nlp.en.segments.sentences.get_sentence_list(data['casebody']['data']['opinions'][0]['text'].strip())
                  
                 pos_cite = 0
                 neg_cite = 0
                 
-                for index, line in enumerate(sentences):
-                    if any(regex.match(line) for regex in cite_list_regex):
-                        #print(sentences[index-1])
-                        sentiment = analyzer.polarity_scores(sentences[index-1])
-                        #print(sentiment)
-                        if sentiment['compound'] > 0.05:
-                            pos_cite += 1
-                        if sentiment['compound'] > -0.05:
-                            neg_cite += 1
+#                for index, line in enumerate(sentences):
+#                    if any(regex.match(line) for regex in cite_list_regex):
+#                        #print(sentences[index-1])
+#                        sentiment = analyzer.polarity_scores(sentences[index-1])
+#                        #print(sentiment)
+#                        if sentiment['compound'] > 0.05:
+#                            pos_cite += 1
+#                        if sentiment['compound'] > -0.05:
+#                            neg_cite += 1
                 
                 if gen_count > 0:
                 
@@ -536,13 +538,13 @@ for j in range(0, len(files)): #len(files)
 #state_court_d['alabama_data']['citations'][1001]
 
 
-with open('df_long_final3-25.pkl', 'wb') as handle:
+with open('df_long_final4-11.pkl', 'wb') as handle:
     pickle.dump(state_court_d, handle, protocol=pickle.HIGHEST_PROTOCOL)
 #state_court_d = pd.read_pickle('df_long_final.pkl')
 
 # Convert dictionary of df's to single df, write to .csv (long: one case-citation per line)
 states_single_df = pd.concat(state_court_d.values(), ignore_index=True)
-states_single_df.to_csv('state_court_long_final3-25.csv', index = False)
+states_single_df.to_csv('state_court_long_final4-11.csv', index = False)
 
 # Convert from wide to long (one case per row)
 states_single_df_wide = pd.concat(state_court_d_wide.values(), ignore_index=True, sort=False)
@@ -550,9 +552,9 @@ states_single_df_wide = pd.concat(state_court_d_wide.values(), ignore_index=True
 #           'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
 #           'coleman_liau', 'state', 'word_count', 'pos_cites', 'neg_cites', #'number_cites', 
 #           'has_opinion', 'total_opins', 'greater50', 'opin_author', 'judges']).mean()
-with open('df_wide_final3-25.pkl', 'wb') as handle:
+with open('df_wide_final4-11.pkl', 'wb') as handle:
     pickle.dump(states_single_df_wide, handle, protocol=pickle.HIGHEST_PROTOCOL)
-states_single_df_wide.to_csv('state_court_wide_final3-25.csv', index = False)
+states_single_df_wide.to_csv('state_court_wide_final4-11.csv', index = False)
 
 
 exit()
