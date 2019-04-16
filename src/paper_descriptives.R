@@ -12,9 +12,11 @@ library(urbnmapr)
 #library(usmap)
 
 # Read in data
-wide <- read.csv('state_court_wide_final.csv')
+wide <- read.csv('state_court_wide_final4-12.csv')
 colnames(wide)
 head(wide)
+#wide <- wide[which(wide$decade >= 1770),]
+wide <- wide[which(wide$year >= 1776),]
 
 #long <- read.csv('state_court_long_final.csv')
 #colnames(long)
@@ -31,6 +33,8 @@ length(unique(wide$court))
 group.state <- wide %>% group_by(region) %>%
   summarise(trues = n())
 colnames(group.state)[colnames(group.state) == 'trues'] <- 'total.cases'
+
+group.state <- group.state[order(group.state$total.cases, decreasing = TRUE),]
 
 # Create map of states based on # of cases
 us <- map_data('state')
@@ -61,10 +65,43 @@ group.state %>%
         axis.text.y=element_blank(),
         axis.ticks.y=element_blank()) +
   labs(fill = "Total Cases")
-ggsave('cases_state_al_hi.png')
+ggsave('cases_state_al_hi.png',  width = 8, height = 5)
 
 # Group cases by state since 1950
 wide.1950 <- wide[which(wide$year >= 1950),]
 group.state.1950 <- wide.1950 %>% group_by(region) %>%
   summarise(trues = n())
 colnames(group.state.1950)[colnames(group.state.1950) == 'trues'] <- 'total.cases'
+
+group.state.1950 <- left_join(group.state.1950, states,  by = c('region' = 'state_name'))
+
+options(scipen=999)
+group.state.1950 %>%
+  ggplot(aes(long, lat, group = group, fill = total.cases)) +
+  geom_polygon(color = NA) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) +
+  labs(fill = "Total Cases since 1950")
+ggsave('cases_state_al_hi_post1950.png', width = 8, height = 5)
+
+
+# Group and plot by decade
+group.dec <- wide %>% group_by(decade) %>%
+  summarise(trues = n())
+colnames(group.dec)[colnames(group.dec) == 'trues'] <- 'total.cases'
+ggplot(group.dec, aes(x=decade, y=total.cases)) + geom_point() +
+  xlab('Decade') + ylab('Cases') + theme_bw()
+ggsave('cases_decade.png')       
+
+# Group and plot by year
+group.yr <- wide %>% group_by(year) %>%
+  summarise(trues = n())
+colnames(group.yr)[colnames(group.yr) == 'trues'] <- 'total.cases'
+ggplot(group.yr, aes(x=year, y=total.cases)) + geom_point() +
+  xlab('Year') + ylab('Cases') + theme_bw()
+ggsave('cases_year.png')

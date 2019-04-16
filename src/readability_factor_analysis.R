@@ -8,15 +8,49 @@ library(psych)
 library(ggplot2)
 library(stats)
 library(reshape2)
+library(lavaan)
+library(MVN)
+library(gtable)
+library(gridExtra)
 
-all_cases <- read.csv('state_court_cases_no_cites_50min.csv') #state_court_cases.csv
 
-setwd("C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Min50")
+#all_cases <- read.csv('state_court_cases_no_cites_50min.csv') #state_court_cases.csv
+all_cases <- read.csv('state_court_wide_final4-12.csv')
+all_cases <- all_cases[which(all_cases$year >= 1776),]
+
+#setwd("C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Min50")
 
 # Subset data to only include readability measures
 keep.vars <- c('ari','coleman_liau', 'flesch', 'flesch_kincaid', 'gunning_fog',
                'smog')
 allcases_read <- all_cases[, (names(all_cases) %in% keep.vars)]
+
+# Plot distributions
+p1 <- ggplot(allcases_read, aes(x=ari)) + geom_density() + xlim(c(0,100)) + xlab('ARI') + ylim(c(0,0.3))
+p2 <- ggplot(allcases_read, aes(x=coleman_liau)) + geom_density() + xlim(c(0,100)) + xlab('Coleman-Liau') + ylim(c(0,0.3))
+p3 <- ggplot(allcases_read, aes(x=flesch)) + geom_density() + xlim(c(0,100)) + xlab('Fleisch') + ylim(c(0,0.3))
+p4 <- ggplot(allcases_read, aes(x=flesch_kincaid)) + geom_density() + xlim(c(0,100)) + xlab('Fleisch-Kincaid') + ylim(c(0,0.3))
+p5 <- ggplot(allcases_read, aes(x=gunning_fog)) + geom_density() + xlim(c(0,100)) + xlab('Gunning-Fog') + ylim(c(0,0.3))
+p6 <- ggplot(allcases_read, aes(x=smog)) + geom_density() + xlim(c(0,100)) + xlab('SMOG') + ylim(c(0,0.3))
+
+png('density_plots_read.png')
+grid.arrange(p1, p2, p3, p4, p5, p6, ncol=3)
+dev.off()
+
+# Fit model
+cfa.model <- 'f1 =~ ari + coleman_liau + 0*flesch + flesch_kincaid + gunning_fog + smog
+              f2 =~ ari + coleman_liau + flesch + flesch_kincaid + 0*gunning_fog + smog'
+cfa.fit <- cfa(cfa.model, data=allcases_read, std.lv=T, std.ov=T)
+summary(cfa.fit)
+
+# Observed covariance matrix (with denominator n)
+#s1 <- cov(cfa.model) * (nrow(cfa.model)-1)/nrow(cfa.model)
+
+parameterEstimates(cfa.fit)
+inspect(cfa.fit,what="std")
+inspect(cfa.fit,what="std")$lambda
+inspect(cfa.fit,what = "std")$beta
+
 
 # Maximum Likelihood Factor Analysis w/ promax rotation (measures should not be
 # orthogonal)
@@ -121,6 +155,25 @@ colnames(state_decade_1f) <- c('state','decade','average_1f','average_2f',
                                #'average_total_cite', 'average_us_cites')
 state_decade_1f <- state_decade_1f[with(state_decade_1f, order(state, decade)),]
 
+
+decade_1f <- aggregate(all_cases_factors[,c('Factor1','Factor2', "Comp.1",
+                                                  "Comp.2", "RC1", "RC2", 'ari',
+                                                  'coleman_liau', 'flesch',
+                                                  'flesch_kincaid', 'smog',
+                                                  'gunning_fog', 'word_count')], 
+                             #'SCOTUS_cites', 'total_cites',
+                             #us_cites')], 
+                             list(all_cases_factors$decade), mean)
+year_1f <- aggregate(all_cases_factors[,c('Factor1','Factor2', "Comp.1",
+                                          "Comp.2", "RC1", "RC2", 'ari',
+                                          'coleman_liau', 'flesch',
+                                          'flesch_kincaid', 'smog',
+                                          'gunning_fog', 'word_count')], 
+                     #'SCOTUS_cites', 'total_cites',
+                     #us_cites')], 
+                     list(all_cases_factors$year), mean)
+
+
 ### Plot average factor score by decade by state
 states <- as.character(unique(state_decade_1f$state))
 pdf('average_1f_decade.pdf')
@@ -148,6 +201,13 @@ for (i in 1:length(states)) {
   print(final.plot)
 }
 dev.off() 
+
+
+# Plot 1f scores by decade
+
+
+
+
 
 # Plot average PC scores by decade by state
 pdf('average_pc1_decade.pdf')
