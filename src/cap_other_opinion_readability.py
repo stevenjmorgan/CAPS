@@ -181,40 +181,40 @@ for j in range(0, len(files)): #0, len(files)
                         
                         # Count # of citations
                         gen_count = len(cite_list)
-                        cite_names = ''
-                        
-                        # Create regex's based on extracted citations
-                        for el in range(0, len(cite_list)):
-                            if el == 0:
-                                cite_names = cite_list[el]['citation_str']
-                            else:
-                                cite_names = cite_names + ', ' + cite_list[el]['citation_str']
+#                        cite_names = ''
+#                        
+#                        # Create regex's based on extracted citations
+#                        for el in range(0, len(cite_list)):
+#                            if el == 0:
+#                                cite_names = cite_list[el]['citation_str']
+#                            else:
+#                                cite_names = cite_names + ', ' + cite_list[el]['citation_str']
                                 
-                        # Create list of citation names, Make a regex that matches if any of our regexes match.
-                        cite_list_source = [d['citation_str'] for d in cite_list]
-                        cite_list_source = [e.replace('(', '').replace(')', '') for e in cite_list_source]
-                        cite_list_source = list(set(cite_list_source))
-                        cite_list_source = [a for a in cite_list_source if len(a.split()) < 7]
-                        try:
-                            cite_list_regex = [re.compile(elem) for elem in cite_list_source]
-                        except:
-                            pass
+#                        # Create list of citation names, Make a regex that matches if any of our regexes match.
+#                        cite_list_source = [d['citation_str'] for d in cite_list]
+#                        cite_list_source = [e.replace('(', '').replace(')', '') for e in cite_list_source]
+#                        cite_list_source = list(set(cite_list_source))
+#                        cite_list_source = [a for a in cite_list_source if len(a.split()) < 7]
+#                        try:
+#                            cite_list_regex = [re.compile(elem) for elem in cite_list_source]
+#                        except:
+#                            pass
                         
-                        # Sentence parser
-                        sentences = lexnlp.nlp.en.segments.sentences.get_sentence_list(data['casebody']['data']['opinions'][0]['text'].strip())
-                         
-                        pos_cite = 0
-                        neg_cite = 0
-                        
-                        for index, line in enumerate(sentences):
-                            if any(regex.match(line) for regex in cite_list_regex):
-                                #print(sentences[index-1])
-                                sentiment = analyzer.polarity_scores(sentences[index-1])
-                                #print(sentiment)
-                                if sentiment['compound'] > 0.05:
-                                    pos_cite += 1
-                                if sentiment['compound'] > -0.05:
-                                    neg_cite += 1
+#                        # Sentence parser
+#                        sentences = lexnlp.nlp.en.segments.sentences.get_sentence_list(data['casebody']['data']['opinions'][0]['text'].strip())
+#                         
+#                        pos_cite = 0
+#                        neg_cite = 0
+#                        
+#                        for index, line in enumerate(sentences):
+#                            if any(regex.match(line) for regex in cite_list_regex):
+#                                #print(sentences[index-1])
+#                                sentiment = analyzer.polarity_scores(sentences[index-1])
+#                                #print(sentiment)
+#                                if sentiment['compound'] > 0.05:
+#                                    pos_cite += 1
+#                                if sentiment['compound'] > -0.05:
+#                                    neg_cite += 1
                      
                         court_d.update(case_id = case_id,
                                            court = data['court']['name'], 
@@ -226,7 +226,7 @@ for j in range(0, len(files)): #0, len(files)
                                            #citations = cite_names,
                                            #reporter = reporter,
                                            number_cites = gen_count,
-                                           pos_cites = pos_cite, neg_cites = neg_cite,
+                                           #pos_cites = pos_cite, neg_cites = neg_cite,
                                            flesch = flesch,
                                            flesch_kincaid = flesch_kincaid,
                                            gunning_fog = fog,
