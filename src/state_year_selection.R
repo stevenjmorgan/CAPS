@@ -74,3 +74,45 @@ stargazer(fit.1f, omit=c('year','state'),
           dep.var.labels = c('Readability: First Factor'),
           covariate.labels = c('Appointed', 'Retention Election', 
                                'Partisan Election', 'Caseload'))
+
+
+## Model citations
+fit.total.cites <- lm(paste('number_cites',selection.formula,sep='~'),
+                      data = year_state_1f)
+summary(fit.total.cites)
+
+fit.pos.cites <- lm(paste('pos_cites',selection.formula,sep='~'),
+                      data = year_state_1f)
+summary(fit.pos.cites)
+
+fit.neg.cites <- lm(paste('neg_cites',selection.formula,sep='~'),
+                    data = year_state_1f)
+summary(fit.neg.cites)
+
+stargazer(fit.total.cites, fit.pos.cites, fit.neg.cites, 
+          omit=c('year','state'),
+          dep.var.labels = c('Total Citations', 'Positive Citations', 
+                             'Negative Citations'),
+          covariate.labels = c('Appointed', 'Retention Election', 
+                               'Partisan Election', 'Caseload'))
+
+# Poisson regression
+fit.total.cites.pois <- glm(paste('number_cites',selection.formula,sep='~'),
+                        data = year_state_1f, family = poisson)
+summary(fit.total.cites.pois)
+
+fit.pos.cites.pois <- glm(paste('pos_cites',selection.formula,sep='~'),
+                      data = year_state_1f, family = poisson)
+summary(fit.pos.cites.pois)
+
+fit.neg.cites.pois <- glm(paste('neg_cites',selection.formula,sep='~'),
+                      data = year_state_1f, family = poisson)
+summary(fit.neg.cites.pois)
+
+stargazer(fit.total.cites.pois, fit.pos.cites.pois, fit.neg.cites.pois, 
+          omit=c('year','state'),
+          dep.var.labels = c('Total Citations', 'Positive Citations', 
+                             'Negative Citations'),
+          covariate.labels = c('Appointed', 'Retention Election', 
+                               'Partisan Election', 'Caseload'))
+

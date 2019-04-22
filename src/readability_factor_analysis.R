@@ -18,6 +18,8 @@ library(plyr)
 #all_cases <- read.csv('state_court_cases_no_cites_50min.csv') #state_court_cases.csv
 all_cases <- read.csv('state_court_wide_final4-12.csv')
 all_cases <- all_cases[which(all_cases$year >= 1776),]
+all_cases$pos_cites[is.na(all_cases$pos_cites)] <- 0
+all_cases$neg_cites[is.na(all_cases$neg_cites)] <- 0
 
 #setwd("C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Min50")
 
@@ -25,6 +27,7 @@ all_cases <- all_cases[which(all_cases$year >= 1776),]
 keep.vars <- c('ari','coleman_liau', 'flesch', 'flesch_kincaid', 'gunning_fog',
                'smog', 'number_cites', 'pos_cites', 'neg_cites')
 allcases_read <- all_cases[, (names(all_cases) %in% keep.vars)]
+
 
 # Plot distributions
 p1 <- ggplot(allcases_read, aes(x=ari)) + geom_density() + xlim(c(0,100)) + xlab('ARI') + ylim(c(0,0.3))
@@ -55,7 +58,8 @@ inspect(cfa.fit,what = "std")$beta
 
 # Maximum Likelihood Factor Analysis w/ promax rotation (measures should not be
 # orthogonal)
-fit <- factanal(allcases_read, 3, rotation="promax")
+fact.vars <- c('ari','coleman_liau', 'flesch', 'flesch_kincaid', 'gunning_fog','smog')
+fit <- factanal(allcases_read[,(names(allcases_read) %in% fact.vars)], 3, rotation="promax")
 print(fit, digits=2, cutoff=.3, sort=TRUE)
 # plot factor 1 by factor 2 
 load <- fit$loadings[,1:2] 
@@ -66,7 +70,7 @@ dev.off()
 
 # Maximum Likelihood Factor Analysis w/ promax rotation w/ 2 factors
 # (measures should not be orthogonal)
-fit.2f.pro <- factanal(allcases_read, 2, rotation="promax")
+fit.2f.pro <- factanal(allcases_read[,(names(allcases_read) %in% fact.vars)], 2, rotation="promax")
 print(fit.2f.pro, digits=2, cutoff=.3, sort=TRUE)
 # plot factor 1 by factor 2 
 load <- fit.2f.pro$loadings[,1:2]
@@ -76,7 +80,7 @@ text(load,labels=names(allcases_read),cex=.7) # add variable names
 dev.off()
 
 # Maximum Likelihood Factor Analysis w/ varimax rotation 
-fit.var <- factanal(allcases_read, 3, rotation="varimax")
+fit.var <- factanal(allcases_read[,(names(allcases_read) %in% fact.vars)], 3, rotation="varimax")
 print(fit.var, digits=2, cutoff=.3, sort=TRUE)
 # plot factor 1 by factor 2 
 load <- fit.var$loadings[,1:2]
@@ -86,7 +90,7 @@ text(load,labels=names(allcases_read),cex=.7) # add variable names
 dev.off()
 
 # Maximum Likelihood Factor Analysis w/ varimax rotation w/ 2 factors 
-fit.var.2f <- factanal(allcases_read, 2, rotation="varimax")
+fit.var.2f <- factanal(allcases_read[,(names(allcases_read) %in% fact.vars)], 2, rotation="varimax")
 print(fit.var.2f, digits=2, cutoff=.3, sort=TRUE)
 # plot factor 1 by factor 2 
 load <- fit.var.2f$loadings[,1:2]
@@ -96,7 +100,7 @@ text(load,labels=names(allcases_read),cex=.7) # add variable names
 dev.off()
 
 # Extract first factor based on 2 factor varimax rotation
-fit.final <- factanal(allcases_read, 2,
+fit.final <- factanal(allcases_read[,(names(allcases_read) %in% fact.vars)], 2,
                 scores=c("regression"),
                 rotation="varimax")
 print(fit.final, digits=2, cutoff=.3, sort=TRUE)
@@ -105,7 +109,7 @@ factor_1_2 <- as.data.frame(fit.final$scores)
 all_cases_factors <- cbind(all_cases, factor_1_2)
 
 # PCA
-pca.fit <- princomp(allcases_read, cor=TRUE)
+pca.fit <- princomp(allcases_read[,(names(allcases_read) %in% fact.vars)], cor=TRUE)
 summary(pca.fit)
 png('scree_plot.png')
 plot(pca.fit,type="lines", main = 'Scree Plot: Proportion of Variance Explained of Six Readability Measures')
@@ -115,7 +119,7 @@ dev.off()
 pca.scores <- as.data.frame(pca.fit$scores)
 
 # PCA w/ varimax rotation
-pca.rotated <- psych::principal(allcases_read, rotate="varimax", nfactors=3, scores=TRUE)
+pca.rotated <- psych::principal(allcases_read[,(names(allcases_read) %in% fact.vars)], rotate="varimax", nfactors=3, scores=TRUE)
 print(pca.rotated$scores[1:5,])
 
 
@@ -190,6 +194,7 @@ colnames(year_state_1f)[2] <- 'year'
 freq <- count(all_cases_factors, vars=c("year","state"))
 year_state_1f <- merge(year_state_1f, freq, by = c('state','year'), all.x = TRUE)
 year_state_1f <- year_state_1f[order(year_state_1f$state, year_state_1f$year),]
+View(year_state_1f)
 
 save(year_state_1f, file = 'year_state_measures.RData')
 
