@@ -96,7 +96,7 @@ stargazer(fit.total.cites, fit.pos.cites, fit.neg.cites,
           covariate.labels = c('Appointed', 'Retention Election', 
                                'Partisan Election', 'Caseload'))
 
-# Poisson regression
+# Poisson regression models of citations
 fit.total.cites.pois <- glm(paste('number_cites',selection.formula,sep='~'),
                         data = year_state_1f, family = poisson)
 summary(fit.total.cites.pois)
@@ -115,4 +115,3 @@ stargazer(fit.total.cites.pois, fit.pos.cites.pois, fit.neg.cites.pois,
                              'Negative Citations'),
           covariate.labels = c('Appointed', 'Retention Election', 
                                'Partisan Election', 'Caseload'))
-
