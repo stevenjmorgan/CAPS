@@ -12,6 +12,7 @@ library(lavaan)
 library(MVN)
 library(gtable)
 library(gridExtra)
+library(plyr)
 
 
 #all_cases <- read.csv('state_court_cases_no_cites_50min.csv') #state_court_cases.csv
@@ -172,6 +173,23 @@ year_1f <- aggregate(all_cases_factors[,c('Factor1','Factor2', "Comp.1",
                      #'SCOTUS_cites', 'total_cites',
                      #us_cites')], 
                      list(all_cases_factors$year), mean)
+
+# Group by year-state median, sort by state
+year_state_1f <- aggregate(all_cases_factors[,c('Factor1','Factor2', "Comp.1",
+                                          "Comp.2", "RC1", "RC2", 'ari',
+                                          'coleman_liau', 'flesch',
+                                          'flesch_kincaid', 'smog',
+                                          'gunning_fog', 'word_count')], 
+                     #'SCOTUS_cites', 'total_cites',
+                     #us_cites')], 
+                     list(all_cases_factors$state, all_cases_factors$year), median)
+colnames(year_state_1f)[1] <- 'state'
+colnames(year_state_1f)[2] <- 'year'
+freq <- count(all_cases_factors, vars=c("year","state"))
+year_state_1f <- merge(year_state_1f, freq, by = c('state','year'), all.x = TRUE)
+year_state_1f <- year_state_1f[order(year_state_1f$state, year_state_1f$year),]
+
+save(year_state_1f, file = 'year_state_measures.RData')
 
 
 ### Plot average factor score by decade by state
