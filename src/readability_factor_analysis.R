@@ -23,7 +23,7 @@ all_cases <- all_cases[which(all_cases$year >= 1776),]
 
 # Subset data to only include readability measures
 keep.vars <- c('ari','coleman_liau', 'flesch', 'flesch_kincaid', 'gunning_fog',
-               'smog')
+               'smog', 'number_cites', 'pos_cites', 'neg_cites')
 allcases_read <- all_cases[, (names(all_cases) %in% keep.vars)]
 
 # Plot distributions
@@ -179,7 +179,9 @@ year_state_1f <- aggregate(all_cases_factors[,c('Factor1','Factor2', "Comp.1",
                                           "Comp.2", "RC1", "RC2", 'ari',
                                           'coleman_liau', 'flesch',
                                           'flesch_kincaid', 'smog',
-                                          'gunning_fog', 'word_count')], 
+                                          'gunning_fog', 'word_count',
+                                          'number_cites', 'pos_cites', 
+                                          'neg_cites')], 
                      #'SCOTUS_cites', 'total_cites',
                      #us_cites')], 
                      list(all_cases_factors$state, all_cases_factors$year), median)
