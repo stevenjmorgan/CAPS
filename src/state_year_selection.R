@@ -115,3 +115,20 @@ stargazer(fit.total.cites.pois, fit.pos.cites.pois, fit.neg.cites.pois,
                              'Negative Citations'),
           covariate.labels = c('Appointed', 'Retention Election', 
                                'Partisan Election', 'Caseload'))
+
+# Logistic regression citations: does opinion cite a case?
+year_state_1f$cite.bi <- ifelse(year_state_1f$number_cites > 0, 1, 0)
+year_state_1f$pos.cite.bi <- ifelse(year_state_1f$pos_cites > 0, 1, 0)
+year_state_1f$neg_cite.bi <- ifelse(year_state_1f$neg_cites > 0, 1, 0)
+
+fit.total.cites.bi <- glm(paste('cite.bi',selection.formula,sep='~'),
+                          data = year_state_1f, family = 'binomial')
+summary(fit.total.cites.bi)
+
+fit.pos.cites.bi <- glm(paste('pos.cite.bi',selection.formula,sep='~'),
+                          data = year_state_1f, family = 'binomial')
+summary(fit.pos.cites.bi)
+
+fit.neg.cites.bi <- glm(paste('neg_cite.bi',selection.formula,sep='~'),
+                          data = year_state_1f, family = 'binomial')
+summary(fit.neg.cites.bi)
