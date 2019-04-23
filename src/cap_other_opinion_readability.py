@@ -162,7 +162,7 @@ for j in range(0, len(files)): #0, len(files)
                         
                         # Count words, published opinions, extract state
                         w_count = len(data['casebody']['data']['opinions'][opin]['text'].split())
-                        state = states[j].split('_data')[j].replace('_', ' ').capitalize()
+                        state = states[j].split('_data')[0].replace('_', ' ').capitalize()
                         greater50 = 1 if w_count > 50 else 0
                         
                         try:
