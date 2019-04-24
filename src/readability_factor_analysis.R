@@ -16,8 +16,11 @@ library(plyr)
 
 
 #all_cases <- read.csv('state_court_cases_no_cites_50min.csv') #state_court_cases.csv
-all_cases <- read.csv('state_court_wide_final4-12.csv')
+#all_cases <- read.csv('state_court_wide_final4-12.csv')
+all_cases <- read.csv('state_court_wide_final4-23.csv')
+
 all_cases <- all_cases[which(all_cases$year >= 1776),]
+summary(all_cases$pos_cites)
 all_cases$pos_cites[is.na(all_cases$pos_cites)] <- 0
 all_cases$neg_cites[is.na(all_cases$neg_cites)] <- 0
 
@@ -40,6 +43,11 @@ p6 <- ggplot(allcases_read, aes(x=smog)) + geom_density() + xlim(c(0,100)) + xla
 png('density_plots_read.png')
 grid.arrange(p1, p2, p3, p4, p5, p6, ncol=3)
 dev.off()
+
+summary(all_cases$smog)
+hist(all_cases$smog)
+summary(all_cases$smog < 5) # Count a number of sentences (at least 30)
+summary(all_cases$smog == 0)
 
 # Fit model
 cfa.model <- 'f1 =~ ari + coleman_liau + 0*flesch + flesch_kincaid + gunning_fog + smog
