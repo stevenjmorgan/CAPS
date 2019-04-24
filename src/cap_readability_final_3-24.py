@@ -323,7 +323,7 @@ columns = ['case_id', 'court','date','cite','case','year', 'decade',
            'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
            'coleman_liau', 'state', 'word_count', 'number_cites', 'citations',
            'pos_cites', 'neg_cites', 'has_opinion', 'total_opins', 'greater50',
-           'opin_author', 'judges']
+           'opin_author', 'judges', 'sentence_len', 'sentence_30']
 for name in states:
     state_court_d[name] = pd.DataFrame(columns=columns)
     state_court_d_wide[name] = pd.DataFrame(columns=columns)
@@ -419,6 +419,9 @@ for j in range(0, len(files)): #0, len(files)
                 
                 # Sentence parser
                 sentences = lexnlp.nlp.en.segments.sentences.get_sentence_list(data['casebody']['data']['opinions'][0]['text'].strip())
+                
+                sent_len = len(sentences)
+                sent_30 = 1 if sent_len >= 30 else 0
                  
                 pos_cite = 0
                 neg_cite = 0
@@ -466,7 +469,9 @@ for j in range(0, len(files)): #0, len(files)
                                        total_opins = total_opins,
                                        greater50 = greater50,
                                        opin_author = opin_author,
-                                       judges = judges)
+                                       judges = judges,
+                                       sentence_len = sent_len,
+                                       sentence_30 = sent_30)
                         rows_list.append(court_d)
                         
                 else:
@@ -495,7 +500,9 @@ for j in range(0, len(files)): #0, len(files)
                                    total_opins = total_opins,
                                    greater50 = greater50,
                                    opin_author = opin_author,
-                                   judges = judges)
+                                   judges = judges,
+                                   sentence_len = 0,
+                                   sentence_30 = 0)
                     rows_list.append(court_d)
                 
                 case_id += 1
