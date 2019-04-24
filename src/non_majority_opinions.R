@@ -153,3 +153,83 @@ ggplot(dec.scores, aes(decade)) +
   labs(x='Decade', y = 'Average Readability Scores') +
   theme_bw()
 ggsave('read.decade.png')
+
+
+
+##### Citations
+# Plot average number of citations per case by year
+ggplot(data = year.scores, aes(x = year, y = number_cites)) + 
+  geom_point() + labs(x = 'Year', y = 'Average # Citations')
+ggsave('non_maj_citations.png')
+
+# Plot average number of citations per case by decade
+ggplot(data = dec.scores, aes(x = decade, y = number_cites)) + 
+  geom_point() + labs(x = 'Decade', y = 'Average # Citations')
+ggsave('non_maj_citations_dec.png')
+
+
+# Citations in dissenting opinions
+dissents <- non_major[which(non_major$opin_type=='dissent'),]
+year.scores.dis <- aggregate(dissents[,c('ari','coleman_liau','flesch',
+                                      'flesch_kincaid','smog','gunning_fog',
+                                      'word_count','number_cites')], 
+                         list(dissents$year), mean)
+colnames(year.scores.dis)[1] <- 'year'
+
+ggplot(data = year.scores.dis, aes(x = year, y = number_cites)) + 
+  geom_point() + labs(x = 'Year', y = 'Average # Citations')
+ggsave('dissent_citations_yr.png')
+
+dec.scores.dis <- aggregate(dissents[,c('ari','coleman_liau','flesch',
+                                         'flesch_kincaid','smog','gunning_fog',
+                                         'word_count','number_cites')], 
+                             list(dissents$decade), mean)
+colnames(dec.scores.dis)[1] <- 'decade'
+
+ggplot(data = dec.scores.dis, aes(x = decade, y = number_cites)) + 
+  geom_point() + labs(x = 'Decade', y = 'Average # Citations')
+ggsave('dissent_citations_dec.png')
+
+
+# Citations in concurring opinions
+concurs <- non_major[which(non_major$opin_type=='concurrence'),]
+year.scores.concur <- aggregate(concurs[,c('ari','coleman_liau','flesch',
+                                         'flesch_kincaid','smog','gunning_fog',
+                                         'word_count','number_cites')], 
+                             list(concurs$year), mean)
+colnames(year.scores.concur)[1] <- 'year'
+
+ggplot(data = year.scores.concur, aes(x = year, y = number_cites)) + 
+  geom_point() + labs(x = 'Year', y = 'Average # Citations')
+ggsave('concur_citations_yr.png')
+
+dec.scores.concur <- aggregate(concurs[,c('ari','coleman_liau','flesch',
+                                           'flesch_kincaid','smog','gunning_fog',
+                                           'word_count','number_cites')], 
+                                list(concurs$decade), mean)
+colnames(dec.scores.concur)[1] <- 'decade'
+
+ggplot(data = dec.scores.concur, aes(x = decade, y = number_cites)) + 
+  geom_point() + labs(x = 'Decade', y = 'Average # Citations')
+ggsave('concur_citations_dec.png')
+
+
+### Word counts
+# All non-maj opinions
+ggplot(data = year.scores, aes(x = year, y = word_count)) + 
+  geom_point() + labs(x = 'Year', y = 'Average # of Words')
+ggsave('word_count_yr.png')
+
+ggplot(data = dec.scores, aes(x = decade, y = word_count)) + 
+  geom_point() + labs(x = 'Decade', y = 'Average # of Words')
+ggsave('word_count_dec.png')
+
+# Dissenting opinions
+ggplot(data = year.scores.dis, aes(x = year, y = word_count)) + 
+  geom_point() + labs(x = 'Year', y = 'Average # of Words')
+ggsave('dissent_word_count_yr.png')
+
+# Concurring opinions
+ggplot(data = year.scores.concur, aes(x = year, y = word_count)) + 
+  geom_point() + labs(x = 'Year', y = 'Average # of Words')
+ggsave('concur_word_count_yr.png')
