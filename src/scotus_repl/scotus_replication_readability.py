@@ -104,5 +104,5 @@ scotus_rep = states_single_df.loc[(states_single_df['year_num'] >= 1946) & (stat
 #scotus = scotus_rep.drop_duplicates()
 
 
-states_single_df.to_csv('scotus_cases.csv', index = False)
+scotus_rep.to_csv('scotus_rep.csv', index = False)
 
