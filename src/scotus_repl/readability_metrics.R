@@ -13,5 +13,5 @@ tagged.text <- treetag(x, treetagger="manual", lang="en", TT.options=list(path="
 hyph.txt.en <- hyphen(x, hyph.pattern = 'en')
 
 
-yo <- textstat_readability(scotus$opin_text[48:58], measure = 'all')
+scotus.metrics <- textstat_readability(scotus$opin_text, measure = 'all')
 
