@@ -13,5 +13,6 @@ tagged.text <- treetag(x, treetagger="manual", lang="en", TT.options=list(path="
 hyph.txt.en <- hyphen(x, hyph.pattern = 'en')
 
 
-scotus.metrics <- textstat_readability('These chickens tastte really good. Iw want more.', measure = 'all')
+scotus.metrics <- textstat_readability('These chickens tastte really good. Iw want more.', measure = 'Coleman.Liau.Grade')
+y <- textstat_readability('These chickens tastte really good. Iw want more.', measure = 'Coleman.Liau.grade')
 
