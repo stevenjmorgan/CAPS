@@ -37,6 +37,8 @@ import textstat
 import lexnlp.extract.en.citations
 import lexnlp.nlp.en.segments.sentences
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import rpy2.rinterface
+from rpy2.robjects.packages import importr
 
 # Round year down to decade
 def round_down(num):
@@ -191,8 +193,13 @@ def dale_chall_readability_score(text):
     return legacy_round(raw_score, 2)  #score
 
 # Set working directory
-#os.chdir('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/')
-os.chdir('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/')
+os.chdir('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/')
+#os.chdir('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/')
+
+
+# Import quanteda from R
+# In R: install.packages("lattice", lib="C:/Users/steve/Anaconda3/Lib/R/library", dependencies=TRUE)
+quanteda = importr("quanteda", lib_loc = "C:/Users/steve/OneDrive/Documents/R/win-library/3.5")
  
 ###############################################################################
 # Read in data into list first (inconsistent graph structure in .jsonl files)
@@ -205,10 +212,10 @@ os.chdir('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/')
 #t2 = datetime.now()
 #print(t2-t1)
 
-#files = list(glob.glob(os.path.join('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data/','*.*')))
-files = list(glob.glob(os.path.join('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data/','*.*')))
-#states = [x.split('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data')[1] for x in files]
-states = [x.split('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data')[1] for x in files]
+files = list(glob.glob(os.path.join('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data/','*.*')))
+#files = list(glob.glob(os.path.join('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data/','*.*')))
+states = [x.split('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data')[1] for x in files]
+#states = [x.split('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data')[1] for x in files]
 states = [x.replace("\\", "") for x in states]
 states = [x.replace(".jsonl", "") for x in states]
  
@@ -323,7 +330,12 @@ columns = ['case_id', 'court','date','cite','case','year', 'decade',
            'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
            'coleman_liau', 'state', 'word_count', 'number_cites', 'citations',
            'pos_cites', 'neg_cites', 'has_opinion', 'total_opins', 'greater50',
-           'opin_author', 'judges', 'sentence_len', 'sentence_30']
+           'opin_author', 'judges', 'sentence_len', 'sentence_30', 
+           'ARI_R', 'RIX_R', 'Coleman_Liau_Grade_R', 'Coleman_Liau_Short_R',
+           'Danielson_Bryan_R', 'Dickes_Steiwer_R', 'ELF_R', 
+           'Farr_Jenkins_Paterson_R', 'flesch_R', 'flesh_kincaid_R',
+           'FORCAST_R', 'Fucks_R', 'FOG_R', 'Linsear_Write_R', 'nWS_R', 
+           'SMOG_R', 'Strain_R', 'Wheeler_Smith_R']
 for name in states:
     state_court_d[name] = pd.DataFrame(columns=columns)
     state_court_d_wide[name] = pd.DataFrame(columns=columns)
@@ -349,7 +361,7 @@ for j in range(0, len(files)): #0, len(files)
         court_d = {}
         for line in f:
         
-            #if case_id == 100:
+            #if case_id == 10:
             #    break
             
             data = json.loads(line)
@@ -370,6 +382,30 @@ for j in range(0, len(files)): #0, len(files)
                 smog = textstat.smog_index(text_clean)
                 ari = textstat.automated_readability_index(text_clean)
                 coleman_liau = textstat.coleman_liau_index(text_clean)
+                
+                # R-based calculations of readability
+                try:
+                    ari_r = float(quanteda.textstat_readability(text_clean, measure = 'ARI')[1].r_repr())
+                    rix_r = float(quanteda.textstat_readability(text_clean, measure = 'RIX')[1].r_repr())
+                    Coleman_Liau_Grade_R = float(quanteda.textstat_readability(text_clean, measure = 'Coleman.Liau.grade')[1].r_repr())
+                    Coleman_Liau_Short_R = float(quanteda.textstat_readability(text_clean, measure = 'Coleman.Liau.short')[1].r_repr())
+                    Danielson_Bryan_R = float(quanteda.textstat_readability(text_clean, measure = 'Danielson.Bryan')[1].r_repr())
+                    Dickes_Steiwer_R = float(quanteda.textstat_readability(text_clean, measure = 'Dickes.Steiwer')[1].r_repr())
+                    ELF_R = float(quanteda.textstat_readability(text_clean, measure = 'ELF')[1].r_repr())
+                    Farr_Jenkins_Paterson_R = float(quanteda.textstat_readability(text_clean, measure = 'Farr.Jenkins.Paterson')[1].r_repr())
+                    flesch_R = float(quanteda.textstat_readability(text_clean, measure = 'Flesch')[1].r_repr())
+                    flesh_kincaid_R = float(quanteda.textstat_readability(text_clean, measure = 'Flesch.Kincaid')[1].r_repr())
+                    FORCAST_R = float(quanteda.textstat_readability(text_clean, measure = 'FORCAST')[1].r_repr())
+                    Fucks_R = float(quanteda.textstat_readability(text_clean, measure = 'Fucks')[1].r_repr())
+                    FOG_R = float(quanteda.textstat_readability(text_clean, measure = 'FOG')[1].r_repr())
+                    Linsear_Write_R = float(quanteda.textstat_readability(text_clean, measure = 'Linsear.Write')[1].r_repr())
+                    nWS_R = float(quanteda.textstat_readability(text_clean, measure = 'nWS')[1].r_repr())
+                    SMOG_R = float(quanteda.textstat_readability(text_clean, measure = 'SMOG')[1].r_repr())
+                    Strain_R = float(quanteda.textstat_readability(text_clean, measure = 'Strain')[1].r_repr())
+                    Wheeler_Smith_R = float(quanteda.textstat_readability(text_clean, measure = 'Wheeler.Smith')[1].r_repr())
+                except:
+                    pass
+                
                 
                 # Count words, published opinions, extract state
                 w_count = len(data['casebody']['data']['opinions'][0]['text'].split())
@@ -400,41 +436,43 @@ for j in range(0, len(files)): #0, len(files)
                     judges = ''
                     pass
                 
-                # Create regex's based on extracted citations
-                for el in range(0, len(cite_list)):
-                    if el == 0:
-                        cite_names = cite_list[el]['citation_str']
-                    else:
-                        cite_names = cite_names + ', ' + cite_list[el]['citation_str']
-                        
-                # Create list of citation names, Make a regex that matches if any of our regexes match.
-                cite_list_source = [d['citation_str'] for d in cite_list]
-                cite_list_source = [e.replace('(', '').replace(')', '') for e in cite_list_source]
-                cite_list_source = list(set(cite_list_source))
-                cite_list_source = [a for a in cite_list_source if len(a.split()) < 7]
-                try:
-                    cite_list_regex = [re.compile(elem) for elem in cite_list_source]
-                except:
-                    pass
-                
-                # Sentence parser
-                sentences = lexnlp.nlp.en.segments.sentences.get_sentence_list(data['casebody']['data']['opinions'][0]['text'].strip())
-                
-                sent_len = len(sentences)
-                sent_30 = 1 if sent_len >= 30 else 0
-                 
-                pos_cite = 0
-                neg_cite = 0
-                
-                for index, line in enumerate(sentences):
-                    if any(regex.match(line) for regex in cite_list_regex):
-                        #print(sentences[index-1])
-                        sentiment = analyzer.polarity_scores(sentences[index-1])
-                        #print(sentiment)
-                        if sentiment['compound'] > 0.05:
-                            pos_cite += 1
-                        if sentiment['compound'] > -0.05:
-                            neg_cite += 1
+# =============================================================================
+#                 # Create regex's based on extracted citations
+#                 for el in range(0, len(cite_list)):
+#                     if el == 0:
+#                         cite_names = cite_list[el]['citation_str']
+#                     else:
+#                         cite_names = cite_names + ', ' + cite_list[el]['citation_str']
+#                         
+#                 # Create list of citation names, Make a regex that matches if any of our regexes match.
+#                 cite_list_source = [d['citation_str'] for d in cite_list]
+#                 cite_list_source = [e.replace('(', '').replace(')', '') for e in cite_list_source]
+#                 cite_list_source = list(set(cite_list_source))
+#                 cite_list_source = [a for a in cite_list_source if len(a.split()) < 7]
+#                 try:
+#                     cite_list_regex = [re.compile(elem) for elem in cite_list_source]
+#                 except:
+#                     pass
+#                 
+#                 # Sentence parser
+#                 sentences = lexnlp.nlp.en.segments.sentences.get_sentence_list(data['casebody']['data']['opinions'][0]['text'].strip())
+#                 
+#                 sent_len = len(sentences)
+#                 sent_30 = 1 if sent_len >= 30 else 0
+#                  
+#                 pos_cite = 0
+#                 neg_cite = 0
+#                 
+#                 for index, line in enumerate(sentences):
+#                     if any(regex.match(line) for regex in cite_list_regex):
+#                         #print(sentences[index-1])
+#                         sentiment = analyzer.polarity_scores(sentences[index-1])
+#                         #print(sentiment)
+#                         if sentiment['compound'] > 0.05:
+#                             pos_cite += 1
+#                         if sentiment['compound'] > -0.05:
+#                             neg_cite += 1
+# =============================================================================
                 
                 if gen_count > 0:
                 
@@ -456,7 +494,7 @@ for j in range(0, len(files)): #0, len(files)
                                        citations = cite_names,
                                        reporter = reporter,
                                        number_cites = gen_count,
-                                       pos_cites = pos_cite, neg_cites = neg_cite,
+                                       #pos_cites = pos_cite, neg_cites = neg_cite,
                                        flesch = flesch,
                                        flesch_kincaid = flesch_kincaid,
                                        gunning_fog = fog,
@@ -470,8 +508,21 @@ for j in range(0, len(files)): #0, len(files)
                                        greater50 = greater50,
                                        opin_author = opin_author,
                                        judges = judges,
-                                       sentence_len = sent_len,
-                                       sentence_30 = sent_30)
+                                       #sentence_len = sent_len,
+                                       ARI_R = ari_r, RIX_R = rix_r,
+                                       Coleman_Liau_Grade_R = Coleman_Liau_Grade_R,
+                                       Coleman_Liau_Short_R = Coleman_Liau_Short_R,
+                                       Danielson_Bryan_R = Danielson_Bryan_R,
+                                       Dickes_Steiwer_R = Dickes_Steiwer_R,
+                                       ELF_R = ELF_R, 
+                                       Farr_Jenkins_Paterson_R = Farr_Jenkins_Paterson_R,
+                                       flesch_R = flesch_R, flesh_kincaid_R = flesh_kincaid_R,
+                                       FORCAST_R = FORCAST_R, Fucks_R = Fucks_R, 
+                                       FOG_R = FOG_R, Linsear_Write_R = Linsear_Write_R,
+                                       nWS_R = nWS_R, SMOG_R = SMOG_R, 
+                                       Strain_R = Strain_R,
+                                       Wheeler_Smith_R = Wheeler_Smith_R)
+                                       #sentence_30 = sent_30)
                         rows_list.append(court_d)
                         
                 else:
@@ -502,7 +553,20 @@ for j in range(0, len(files)): #0, len(files)
                                    opin_author = opin_author,
                                    judges = judges,
                                    sentence_len = 0,
-                                   sentence_30 = 0)
+                                   sentence_30 = 0,
+                                   ARI_R = ari_r, RIX_R = rix_r,
+                                   Coleman_Liau_Grade_R = Coleman_Liau_Grade_R,
+                                   Coleman_Liau_Short_R = Coleman_Liau_Short_R,
+                                   Danielson_Bryan_R = Danielson_Bryan_R,
+                                   Dickes_Steiwer_R = Dickes_Steiwer_R,
+                                   ELF_R = ELF_R, 
+                                   Farr_Jenkins_Paterson_R = Farr_Jenkins_Paterson_R,
+                                   flesch_R = flesch_R, flesh_kincaid_R = flesh_kincaid_R,
+                                   FORCAST_R = FORCAST_R, Fucks_R = Fucks_R, 
+                                   FOG_R = FOG_R, Linsear_Write_R = Linsear_Write_R,
+                                   nWS_R = nWS_R, SMOG_R = SMOG_R, 
+                                   Strain_R = Strain_R,
+                                   Wheeler_Smith_R = Wheeler_Smith_R)
                     rows_list.append(court_d)
                 
                 case_id += 1
@@ -528,12 +592,17 @@ for j in range(0, len(files)): #0, len(files)
             
             
         state_court_d[states[j]] = pd.DataFrame(rows_list)
-        state_court_d[states[j]] = state_court_d[states[j]][columns] # Rearrange columns
+        #state_court_d[states[j]] = state_court_d[states[j]][columns] # Rearrange columns
         
         state_court_d_wide[states[j]] = state_court_d[states[j]].fillna(-999).groupby(['case_id', 'court','date','cite','case','year', 'decade', 
            'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
-           'coleman_liau', 'state', 'word_count', 'pos_cites', 'neg_cites', #'number_cites', 
-           'has_opinion', 'total_opins', 'greater50', 'opin_author', 'judges'], as_index=False).mean() #opin_author, judges
+           'coleman_liau', 'state', 'word_count', #'pos_cites', 'neg_cites', #'number_cites', 
+           'has_opinion', 'total_opins', 'greater50', 'opin_author', 'judges',
+           'ARI_R', 'RIX_R', 'Coleman_Liau_Grade_R', 'Coleman_Liau_Short_R',
+           'Danielson_Bryan_R', 'Dickes_Steiwer_R', 'ELF_R', 
+           'Farr_Jenkins_Paterson_R', 'flesch_R', 'flesh_kincaid_R',
+           'FORCAST_R', 'Fucks_R', 'FOG_R', 'Linsear_Write_R', 'nWS_R', 
+           'SMOG_R', 'Strain_R', 'Wheeler_Smith_R'], as_index=False).mean() #opin_author, judges
         #state_court_d_wide[states[j]] = state_court_d_wide[states[j]][columns]
         
         state_court_d_wide[states[j]] = state_court_d_wide[states[j]].replace(-999, np.NaN)
@@ -550,13 +619,13 @@ for j in range(0, len(files)): #0, len(files)
 #state_court_d['alabama_data']['citations'][1001]
 
 
-with open('df_long_final4-24.pkl', 'wb') as handle:
+with open('df_long_final5-12.pkl', 'wb') as handle:
     pickle.dump(state_court_d, handle, protocol=pickle.HIGHEST_PROTOCOL)
 #state_court_d = pd.read_pickle('df_long_final.pkl')
 
 # Convert dictionary of df's to single df, write to .csv (long: one case-citation per line)
 states_single_df = pd.concat(state_court_d.values(), ignore_index=True)
-states_single_df.to_csv('state_court_long_final4-24.csv', index = False)
+states_single_df.to_csv('state_court_long_final5-12.csv', index = False)
 
 # Convert from wide to long (one case per row)
 states_single_df_wide = pd.concat(state_court_d_wide.values(), ignore_index=True, sort=False)
@@ -564,9 +633,9 @@ states_single_df_wide = pd.concat(state_court_d_wide.values(), ignore_index=True
 #           'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
 #           'coleman_liau', 'state', 'word_count', 'pos_cites', 'neg_cites', #'number_cites', 
 #           'has_opinion', 'total_opins', 'greater50', 'opin_author', 'judges']).mean()
-with open('df_wide_final4-24.pkl', 'wb') as handle:
+with open('df_wide_final5-12.pkl', 'wb') as handle:
     pickle.dump(states_single_df_wide, handle, protocol=pickle.HIGHEST_PROTOCOL)
-states_single_df_wide.to_csv('state_court_wide_final4-24.csv', index = False)
+states_single_df_wide.to_csv('state_court_wide_final5-12.csv', index = False)
 
 
 #old = pd.read_csv('state_court_wide_final.csv')

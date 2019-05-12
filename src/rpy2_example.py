@@ -22,3 +22,7 @@ x.r_repr()
 
 type(quanteda.textstat_readability('The house is cool', measure = 'ARI')[1].r_repr())
 ari_score = float(quanteda.textstat_readability('The house is cool', measure = 'ARI')[1].r_repr())
+
+
+yo = quanteda.textstat_readability('The house is cool', measure = 'all')
+yo[2]
