@@ -157,8 +157,30 @@ state_opins_text = states_single_df
 with open('state_opins_text.pkl', 'wb') as handle:
     pickle.dump(state_opins_text, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-state_opins_text.to_pickle('state_opins_text.pkl')
-state_opins_text.to_pickle('state_opins_text.pkl.gzde', compression='gzip')
 
-### Word embeddings
+# Split df into 5 parts, save each
+df_list = np.array_split(state_opins_text, 5)
+df_list[0].to_pickle('state_opins_text1.pkl')
+df_list[1].to_pickle('state_opins_text2.pkl')
+df_list[2].to_pickle('state_opins_text3.pkl')
+df_list[3].to_pickle('state_opins_text4.pkl')
+df_list[4].to_pickle('state_opins_text5.pkl')
+
+### Load in each pickle file and concatenate
+###
+
+### Process text
 state_opins_text['text.clean'] = state_opins_text['text'].str.replace('[^a-zA-Z]',' ').str.lower()
+stop_re = '\\b'+'\\b|\\b'.join(nltk.corpus.stopwords.words('english'))+'\\b'
+state_opins_text['text.clean'] = state_opins_text['text.clean'].str.replace(stop_re, '')
+
+# Detect common phrases so that we may treat each one as its own word
+phrases = gensim.models.phrases.Phrases(state_opins_text['text.clean'].tolist())
+phraser = gensim.models.phrases.Phraser(phrases)
+train_phrased = phraser[state_opins_text['text.clean'].tolist()]
+
+multiprocessing.cpu_count()
+
+# Run w2v w/ default parameters
+w2v = gensim.models.word2vec.Word2Vec(sentences=train_phrased,workers=4)
+w2v.save('w2v_v1')
