@@ -143,7 +143,7 @@ for j in range(0, len(files)): #0, len(files)
                                cite = data['citations'][0]['cite'], 
                                case = data['name'], 
                                year = case_year, decade = case_decade,
-                               text = data['casebody']['data']['opinions'][0]['text'].str.replace('[^a-zA-Z]',' ').str.lower().str.replace(stop_re, ''))
+                               text = data['casebody']['data']['opinions'][0]['text'].replace('[^a-zA-Z]',' ').lower().replace(stop_re, ''))
                 rows_list.append(court_d)
                 
                 case_id += 1
@@ -176,9 +176,9 @@ state_opins_text = states_single_df
 #state_opins_text['text.clean'] = state_opins_text['text.clean'].str.replace(stop_re, '')
 
 # Detect common phrases so that we may treat each one as its own word
-phrases = gensim.models.phrases.Phrases(state_opins_text['text.clean'].tolist())
+phrases = gensim.models.phrases.Phrases(state_opins_text['text'].tolist())
 phraser = gensim.models.phrases.Phraser(phrases)
-train_phrased = phraser[state_opins_text['text.clean'].tolist()]
+train_phrased = phraser[state_opins_text['text'].tolist()]
 
 multiprocessing.cpu_count()
 
