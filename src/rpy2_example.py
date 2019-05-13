@@ -9,12 +9,13 @@ import rpy2.rinterface
 from rpy2.robjects.packages import importr
 #from rpy2.robjects.packages import importr
 
-base = importr('base', lib_loc = "C:/Users/steve/OneDrive/Documents/R/win-library/3.5")
+base = importr('base', lib_loc = "C:/Users/sum410/OneDrive/Documents/R/win-library/3.5")
 print(base._libPaths()) #[1] "C:/Users/steve/Anaconda3/Lib/R/library"
 
 
 # In R: install.packages("lattice", lib="C:/Users/steve/Anaconda3/Lib/R/library", dependencies=TRUE)
-quanteda = importr("quanteda", lib_loc = "C:/Users/steve/OneDrive/Documents/R/win-library/3.5")
+#quanteda = importr("quanteda", lib_loc = "C:/Users/steve/OneDrive/Documents/R/win-library/3.5")
+quanteda = importr("quanteda", lib_loc = "C:/Users/sum410/Documents/R/R-3.5.2/library")
 #quanteda.chooseCRANmirror(ind=1)
 
 x = quanteda.textstat_readability('The house is cool', measure = 'ARI')[1]

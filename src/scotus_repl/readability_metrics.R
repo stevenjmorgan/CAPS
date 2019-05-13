@@ -16,3 +16,4 @@ hyph.txt.en <- hyphen(x, hyph.pattern = 'en')
 scotus.metrics <- textstat_readability('These chickens tastte really good. Iw want more.', measure = 'Coleman.Liau.Grade')
 y <- textstat_readability('These chickens tastte really good. Iw want more.', measure = 'Coleman.Liau.grade')
 
+.libPaths()

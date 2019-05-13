@@ -193,14 +193,15 @@ def dale_chall_readability_score(text):
     return legacy_round(raw_score, 2)  #score
 
 # Set working directory
-os.chdir('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/')
-#os.chdir('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/')
+#os.chdir('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/')
+os.chdir('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/')
 
 
 # Import quanteda from R
 # In R: install.packages("lattice", lib="C:/Users/steve/Anaconda3/Lib/R/library", dependencies=TRUE)
-quanteda = importr("quanteda", lib_loc = "C:/Users/steve/OneDrive/Documents/R/win-library/3.5")
- 
+#quanteda = importr("quanteda", lib_loc = "C:/Users/steve/OneDrive/Documents/R/win-library/3.5")
+quanteda = importr("quanteda", lib_loc = "C:/Users/sum410/Documents/R/R-3.5.2/library") 
+
 ###############################################################################
 # Read in data into list first (inconsistent graph structure in .jsonl files)
 #t1 = datetime.now()
@@ -212,10 +213,10 @@ quanteda = importr("quanteda", lib_loc = "C:/Users/steve/OneDrive/Documents/R/wi
 #t2 = datetime.now()
 #print(t2-t1)
 
-files = list(glob.glob(os.path.join('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data/','*.*')))
-#files = list(glob.glob(os.path.join('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data/','*.*')))
-states = [x.split('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data')[1] for x in files]
-#states = [x.split('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data')[1] for x in files]
+#files = list(glob.glob(os.path.join('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data/','*.*')))
+files = list(glob.glob(os.path.join('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data/','*.*')))
+#states = [x.split('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data')[1] for x in files]
+states = [x.split('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data')[1] for x in files]
 states = [x.replace("\\", "") for x in states]
 states = [x.replace(".jsonl", "") for x in states]
  
