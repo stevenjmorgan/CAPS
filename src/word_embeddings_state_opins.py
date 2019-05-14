@@ -12,7 +12,7 @@ import pandas as pd
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import numpy as np
-from ds_voc.text_processing import TextProcessing
+from nltk.tokenize import word_tokenize
 
 # Round year down to decade
 def round_down(num):
@@ -180,6 +180,24 @@ state_opins_text = states_single_df
 
 raw = list(state_opins_text['text'])
 print(len(raw))
+
+results = []
+for sentence in raw:
+    sentence_results = []
+    for s in sentence:
+        sentence_results.append(nltk.word_tokenize(sentence))
+    results.append(sentence_results)
+    
+
+  
+# Create CBOW model 
+model1 = gensim.models.Word2Vec(results, min_count = 100,  
+                              size = 300, window = 5) 
+
+
+reviews = state_opins_text['text'].str.cat(sep=' ')
+#function to split text into word
+tokens = word_tokenize(raw)
 
 
 # word2vec expects a list of list: each document is a list of tokens
