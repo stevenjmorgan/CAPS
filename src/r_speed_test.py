@@ -44,4 +44,4 @@ end = time.time()
 print(end - start)
 
 
-x[46].r_repr()
+float(x[46].r_repr())
