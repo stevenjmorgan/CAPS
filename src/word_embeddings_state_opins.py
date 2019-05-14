@@ -12,6 +12,7 @@ import pandas as pd
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import numpy as np
+from ds_voc.text_processing import TextProcessing
 
 # Round year down to decade
 def round_down(num):
@@ -174,6 +175,22 @@ state_opins_text = states_single_df
 #state_opins_text['text.clean'] = state_opins_text['text'].str.replace('[^a-zA-Z]',' ').str.lower()
 #stop_re = '\\b'+'\\b|\\b'.join(nltk.corpus.stopwords.words('english'))+'\\b'
 #state_opins_text['text.clean'] = state_opins_text['text.clean'].str.replace(stop_re, '')
+
+
+
+raw = list(state_opins_text['text'])
+print(len(raw))
+
+
+# word2vec expects a list of list: each document is a list of tokens
+te = TextProcessing()
+sentences = [te.stop_and_stem(c) for c in cleaned]
+
+
+  
+# Create CBOW model 
+model1 = gensim.models.Word2Vec(data, min_count = 100,  
+                              size = 300, window = 5) 
 
 # Detect common phrases so that we may treat each one as its own word
 phrases = gensim.models.phrases.Phrases(state_opins_text['text'].tolist())
