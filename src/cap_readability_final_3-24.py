@@ -377,12 +377,12 @@ for j in range(0, len(files)): #0, len(files)
                 
                 # Remove citations, calculate readability
                 text_clean = data['casebody']['data']['opinions'][0]['text'].replace('(\d+)\s(.+?)\s(\d+)', '')
-                flesch = textstat.flesch_reading_ease(text_clean)
-                flesch_kincaid = textstat.flesch_kincaid_grade(text_clean)
-                fog = textstat.gunning_fog(text_clean)
-                smog = textstat.smog_index(text_clean)
-                ari = textstat.automated_readability_index(text_clean)
-                coleman_liau = textstat.coleman_liau_index(text_clean)
+#                flesch = textstat.flesch_reading_ease(text_clean)
+#                flesch_kincaid = textstat.flesch_kincaid_grade(text_clean)
+#                fog = textstat.gunning_fog(text_clean)
+#                smog = textstat.smog_index(text_clean)
+#                ari = textstat.automated_readability_index(text_clean)
+#                coleman_liau = textstat.coleman_liau_index(text_clean)
                 
                 # R-based calculations of readability
                 try:
@@ -517,12 +517,12 @@ for j in range(0, len(files)): #0, len(files)
                                        reporter = reporter,
                                        number_cites = gen_count,
                                        #pos_cites = pos_cite, neg_cites = neg_cite,
-                                       flesch = flesch,
-                                       flesch_kincaid = flesch_kincaid,
-                                       gunning_fog = fog,
-                                       smog = smog,
-                                       ari = ari,
-                                       coleman_liau = coleman_liau,
+                                       #flesch = flesch,
+                                       #flesch_kincaid = flesch_kincaid,
+                                       #gunning_fog = fog,
+                                       #smog = smog,
+                                       #ari = ari,
+                                       #coleman_liau = coleman_liau,
                                        state = state,
                                        word_count = w_count,
                                        has_opinion = 1,
@@ -561,12 +561,12 @@ for j in range(0, len(files)): #0, len(files)
                                    #citations = cite_names,
                                    #reporter = reporter,
                                    number_cites = gen_count,
-                                   flesch = flesch,
-                                   flesch_kincaid = flesch_kincaid,
-                                   gunning_fog = fog,
-                                   smog = smog,
-                                   ari = ari,
-                                   coleman_liau = coleman_liau,
+                                   #flesch = flesch,
+                                   #flesch_kincaid = flesch_kincaid,
+                                   #gunning_fog = fog,
+                                   #smog = smog,
+                                   #ari = ari,
+                                   #coleman_liau = coleman_liau,
                                    state = state,
                                    word_count = w_count,
                                    has_opinion = 1,
@@ -615,6 +615,11 @@ for j in range(0, len(files)): #0, len(files)
             
         state_court_d[states[j]] = pd.DataFrame(rows_list)
         #state_court_d[states[j]] = state_court_d[states[j]][columns] # Rearrange columns
+        
+        # Store dictionary as pickle after each state
+        f = open("stored_dict.pkl","wb")
+        pickle.dump(state_court_d,f)
+        f.close()
         
         state_court_d_wide[states[j]] = state_court_d[states[j]].fillna(-999).groupby(['case_id', 'court','date','cite','case','year', 'decade', 
            'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
