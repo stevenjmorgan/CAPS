@@ -156,6 +156,8 @@ for j in range(0, len(files)): #0, len(files)
 states_single_df = pd.concat(state_court_d.values(), ignore_index=True)
 state_opins_text = states_single_df
 
+state_opins_text.to_csv('state_court_text.csv')
+
 #state_opins_text.to_csv('state_court_text.csv', index = False)
 #with open('state_opins_text.pkl', 'wb') as handle:
 #    pickle.dump(state_opins_text, handle, protocol=pickle.HIGHEST_PROTOCOL)
