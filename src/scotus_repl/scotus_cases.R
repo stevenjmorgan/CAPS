@@ -104,4 +104,6 @@ save(comb, file = 'scotus_read_metrics.RData')
 #}
 #proc.time() - ptm #5.31
 
+
 ### PCA
+#load('scotus_read_metrics.RData')
