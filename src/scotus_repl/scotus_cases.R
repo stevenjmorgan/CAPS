@@ -92,7 +92,16 @@ for (i in 1:nrow(comb)) {
 save(comb, file = 'scotus_read_metrics.RData')
 
 ## Use apply function instead
+#ptm <- proc.time()
+#test2 <- function(x) {  
+#  textstat_readability(x, measure = 'ARI')$ARI}
+#test <- sapply(comb$opin_text[1:1000], test2)
+#proc.time() - ptm #59.8
 
-
+#ptm <- proc.time()
+#for (i in 1:1000) {
+#  slower <- textstat_readability(comb$opin_text[i], measure = 'ARI')$ARI
+#}
+#proc.time() - ptm #5.31
 
 ### PCA
