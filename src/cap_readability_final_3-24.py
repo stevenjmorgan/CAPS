@@ -622,8 +622,9 @@ for j in range(0, len(files)): #0, len(files)
         f.close()
         
         state_court_d_wide[states[j]] = state_court_d[states[j]].fillna(-999).groupby(['case_id', 'court','date','cite','case','year', 'decade', 
-           'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
-           'coleman_liau', 'state', 'word_count', #'pos_cites', 'neg_cites', #'number_cites', 
+           #'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
+           #'coleman_liau', 
+           'state', 'word_count', #'pos_cites', 'neg_cites', #'number_cites', 
            'has_opinion', 'total_opins', 'greater50', 'opin_author', 'judges',
            'ARI_R', 'RIX_R', 'Coleman_Liau_Grade_R', 'Coleman_Liau_Short_R',
            'Danielson_Bryan_R', 'Dickes_Steiwer_R', 'ELF_R', 
