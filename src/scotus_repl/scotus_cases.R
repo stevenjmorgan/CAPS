@@ -89,4 +89,10 @@ for (i in 1:nrow(comb)) {
   }
 }
 
+save(comb, file = 'scotus_read_metrics.RData')
+
+## Use apply function instead
+
+
+
 ### PCA
