@@ -24,4 +24,10 @@ summary(scotus$decisionType == 1)
 
 # Read in SCOTUS CAP data
 scotus_cap <- read.csv('scotus_rep.csv')
+colnames(scotus_cap)
+scotus_cap$cite <- as.character(scotus_cap$cite)
+scotus_cap <- scotus_cap[,c('cite','opin_text')]
 
+# Merge in text data
+comb <- merge(scotus, scotus_cap, by.x = 'usCite', by.y = 'cite', all.x = F)
+write.csv(comb, 'scotus_subset.csv')
