@@ -3,7 +3,12 @@ setwd("C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP")
 
 library(quanteda)
 
+Sys.setenv('R_MAX_VSIZE'=32000000000)
+
+print('Reading in data...')
 cases <- read.csv('state_court_text.csv')
+print('Data ingested!')
+
 
 cases$ari <- NA
 cases$rix <- NA
@@ -58,4 +63,9 @@ for (i in 1:nrow(cases)) {
   }
 }
 
+print('Readability measures calculated.')
+
 cases <- cases[,-c('text')]
+
+print('Saving file to .csv...')
+write.csv(cases, file = 'metrics_quanteda.csv')
