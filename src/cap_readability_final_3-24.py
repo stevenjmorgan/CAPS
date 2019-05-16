@@ -23,7 +23,7 @@ import json
 #import numpy as np 
 import pandas as pd
 import numpy as np
-import re
+import re, time
 import os
 import glob
 import sys
@@ -36,11 +36,10 @@ import textstat
 #import timeit
 import lexnlp.extract.en.citations
 import lexnlp.nlp.en.segments.sentences
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+#from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import rpy2.rinterface
 from rpy2.robjects.packages import importr
 
-#break
 
 # Round year down to decade
 def round_down(num):
@@ -202,7 +201,12 @@ os.chdir('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/')
 # Import quanteda from R
 # In R: install.packages("lattice", lib="C:/Users/steve/Anaconda3/Lib/R/library", dependencies=TRUE)
 #quanteda = importr("quanteda", lib_loc = "C:/Users/steve/OneDrive/Documents/R/win-library/3.5")
-quanteda = importr("quanteda", lib_loc = "C:/Users/sum410/Documents/R/R-3.5.2/library") 
+#quanteda = importr("quanteda", lib_loc = "C:/Users/sum410/Documents/R/R-3.5.2/library") 
+quanteda = importr("quanteda", lib_loc = "C:/Program Files/R/R-3.5.1/library") 
+
+print('Going to sleep!')
+time.sleep(18000)
+print('Done sleeping! Time to ingest data...')
 
 ###############################################################################
 # Read in data into list first (inconsistent graph structure in .jsonl files)
@@ -352,7 +356,7 @@ for name in states:
 case_year = ''
 case_decade = 0
 case_id = 0
-analyzer = SentimentIntensityAnalyzer() # Vader sentiment analysis
+#analyzer = SentimentIntensityAnalyzer() # Vader sentiment analysis
 for j in range(26, len(files)): #0, len(files)
     
     rows_list = []
