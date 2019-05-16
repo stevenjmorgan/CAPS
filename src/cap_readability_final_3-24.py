@@ -204,9 +204,9 @@ os.chdir('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/')
 #quanteda = importr("quanteda", lib_loc = "C:/Users/sum410/Documents/R/R-3.5.2/library") 
 quanteda = importr("quanteda", lib_loc = "C:/Program Files/R/R-3.5.1/library") 
 
-print('Going to sleep!')
-time.sleep(18000)
-print('Done sleeping! Time to ingest data...')
+#print('Going to sleep!')
+#time.sleep(18000)
+#print('Done sleeping! Time to ingest data...')
 
 ###############################################################################
 # Read in data into list first (inconsistent graph structure in .jsonl files)
@@ -225,6 +225,8 @@ files = list(glob.glob(os.path.join('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP
 states = [x.split('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/Bulk_Data')[1] for x in files]
 states = [x.replace("\\", "") for x in states]
 states = [x.replace(".jsonl", "") for x in states]
+ 
+print("Beginning to ingest data...") 
  
 ### Determine what CAPS says state court name is...runs for a while
 # =============================================================================
