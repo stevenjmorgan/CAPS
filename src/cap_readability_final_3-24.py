@@ -625,7 +625,7 @@ for j in range(0, 26): #0, len(files)
         #state_court_d[states[j]] = state_court_d[states[j]][columns] # Rearrange columns
         
         # Store dictionary as pickle after each state
-        f = open("stored_dict.pkl","wb")
+        f = open("first_25_stored_dict.pkl","wb")
         pickle.dump(state_court_d,f)
         f.close()
         
