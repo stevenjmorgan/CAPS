@@ -359,7 +359,7 @@ case_year = ''
 case_decade = 0
 case_id = 0
 #analyzer = SentimentIntensityAnalyzer() # Vader sentiment analysis
-for j in range(0, 26): #0, len(files)
+for j in range(26, len(files)): #0, len(files)
     
     rows_list = []
     t1 = datetime.now()
