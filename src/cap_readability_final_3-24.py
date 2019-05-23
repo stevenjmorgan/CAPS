@@ -625,7 +625,7 @@ for j in range(26, len(files)): #0, len(files)
         #state_court_d[states[j]] = state_court_d[states[j]][columns] # Rearrange columns
         
         # Store dictionary as pickle after each state
-        f = open("first_25_stored_dict.pkl","wb")
+        f = open("last_25_stored_dict.pkl","wb")
         pickle.dump(state_court_d,f)
         f.close()
         
@@ -655,13 +655,13 @@ for j in range(26, len(files)): #0, len(files)
 #state_court_d['alabama_data']['citations'][1001]
 
 
-with open('df_long_final_top_half.pkl', 'wb') as handle:
+with open('df_long_final_bottom_half.pkl', 'wb') as handle:
     pickle.dump(state_court_d, handle, protocol=pickle.HIGHEST_PROTOCOL)
 #state_court_d = pd.read_pickle('df_long_final.pkl')
 
 # Convert dictionary of df's to single df, write to .csv (long: one case-citation per line)
 states_single_df = pd.concat(state_court_d.values(), ignore_index=True)
-states_single_df.to_csv('state_court_long_final_top_half.csv', index = False)
+states_single_df.to_csv('state_court_long_final_bottom_half.csv', index = False)
 
 # Convert from wide to long (one case per row)
 states_single_df_wide = pd.concat(state_court_d_wide.values(), ignore_index=True, sort=False)
@@ -669,9 +669,9 @@ states_single_df_wide = pd.concat(state_court_d_wide.values(), ignore_index=True
 #           'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
 #           'coleman_liau', 'state', 'word_count', 'pos_cites', 'neg_cites', #'number_cites', 
 #           'has_opinion', 'total_opins', 'greater50', 'opin_author', 'judges']).mean()
-with open('df_wide_final_top_half.pkl', 'wb') as handle:
+with open('df_wide_final_bottom_half.pkl', 'wb') as handle:
     pickle.dump(states_single_df_wide, handle, protocol=pickle.HIGHEST_PROTOCOL)
-states_single_df_wide.to_csv('state_court_wide_final_top_half.csv', index = False)
+states_single_df_wide.to_csv('state_court_wide_final_bottom_half.csv', index = False)
 
 
 #old = pd.read_csv('state_court_wide_final.csv')
