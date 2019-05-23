@@ -201,8 +201,8 @@ os.chdir('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/')
 # Import quanteda from R
 # In R: install.packages("lattice", lib="C:/Users/steve/Anaconda3/Lib/R/library", dependencies=TRUE)
 #quanteda = importr("quanteda", lib_loc = "C:/Users/steve/OneDrive/Documents/R/win-library/3.5")
-#quanteda = importr("quanteda", lib_loc = "C:/Users/sum410/Documents/R/R-3.5.2/library") 
-quanteda = importr("quanteda", lib_loc = "C:/Program Files/R/R-3.5.1/library") 
+quanteda = importr("quanteda", lib_loc = "C:/Users/sum410/Documents/R/R-3.5.2/library") 
+#quanteda = importr("quanteda", lib_loc = "C:/Program Files/R/R-3.5.1/library") 
 
 #print('Going to sleep!')
 #time.sleep(18000)
