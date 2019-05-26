@@ -7,16 +7,9 @@ Run readability measures on ``baseline corpora'' to compare CAPS metrics
 @author: steve
 """
 
-import spacy
 import textstat
-from textstat.textstat import textstatistics, easy_word_set, legacy_round #pip install; conda install will not work
 import pandas as pd
-import numpy as np
-import re, time
 import os
-import glob
-import pickle
-import rpy2.rinterface
 from rpy2.robjects.packages import importr
 import nltk
 from nltk.corpus import gutenberg
@@ -78,7 +71,6 @@ genesis = genesis.replace('\n','').replace('\t','')
 # Number of words in Moby Dick and Genesis
 len(moby)
 len(genesis)
-
 
 # Run readability analysis
 moby_read = read_metrics(moby)
