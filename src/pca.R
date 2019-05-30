@@ -1,18 +1,21 @@
 ### This script applies PCA to the state court readability measures.
 
 rm(list=ls())
-setwd("C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP")
+#setwd("C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP")
+setwd("C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP")
 
 library(factoextra)
 
 # Read in data
 state.courts <- read.csv('state_court_wide_final_bottom_half5-29.csv')
+#state.courts2 <- read.csv('state_court_wide_final_top_half5-30.csv')
+all.courts <- as.data.frame(rbind(state.courts,state.courts2))
 
 # Omit na values
 #read.metrics <- na.omit(state.courts[,15:32])
 
 # Deal w/ infinte values
-x <- read.metrics[rowSums(is.infinite(as.matrix(read.metrics))) == 0, ]
+x <- read.metrics[rowSums(is.infinite(as.matrix(read.metrics))) == 0,]
 
 # Calculate singular value decomposition
 read.pca <- prcomp(x, scale = TRUE)
