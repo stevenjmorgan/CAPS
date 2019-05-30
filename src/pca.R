@@ -8,17 +8,18 @@ library(factoextra)
 
 # Read in data
 state.courts <- read.csv('state_court_wide_final_bottom_half5-29.csv')
-#state.courts2 <- read.csv('state_court_wide_final_top_half5-30.csv')
-all.courts <- as.data.frame(rbind(state.courts,state.courts2))
+state.courts2 <- read.csv('state_court_wide_final_top_half5-30.csv')
+all.courts <- rbind(state.courts,state.courts2)
 
-# Omit na values
-#read.metrics <- na.omit(state.courts[,15:32])
+# Omit na values, subset readability metrics
+read.metrics <- na.omit(all.courts[,15:32])
 
 # Deal w/ infinte values
-x <- read.metrics[rowSums(is.infinite(as.matrix(read.metrics))) == 0,]
+read.metrics <- read.metrics[rowSums(is.infinite(as.matrix(read.metrics))) == 0,]
+rm(state.courts,state.courts2,all.courts)
 
 # Calculate singular value decomposition
-read.pca <- prcomp(x, scale = TRUE)
+read.pca <- prcomp(read.metrics, scale = TRUE)
 
 # Visualize eigenvalues (scree plot)
 fviz_eig(read.pca)
@@ -43,15 +44,16 @@ ggsave('var_biplot.png')
 ### Access PCA results
 # Eigenvalues
 eig.val <- get_eigenvalue(read.pca)
-eig.val
+#eig.val
 
 # Results for Variables
 res.var <- get_pca_var(read.pca)
-res.var$coord          # Coordinates
-res.var$contrib        # Contributions to the PCs
-res.var$cos2           # Quality of representation 
+#res.var$coord          # Coordinates
+#res.var$contrib        # Contributions to the PCs
+#res.var$cos2           # Quality of representation 
+
 # Results for individuals
 res.ind <- get_pca_ind(read.pca)
-res.ind$coord          # Coordinates
-res.ind$contrib        # Contributions to the PCs
-res.ind$cos2           # Quality of representation 
+#res.ind$coord          # Coordinates
+#res.ind$contrib        # Contributions to the PCs
+#res.ind$cos2           # Quality of representation 
