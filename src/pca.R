@@ -5,6 +5,7 @@ rm(list=ls())
 setwd("C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP")
 
 library(factoextra)
+library(ggplot2)
 
 # Read in data
 state.courts <- read.csv('state_court_wide_final_bottom_half5-29.csv')
@@ -57,3 +58,17 @@ res.ind <- get_pca_ind(read.pca)
 #res.ind$coord          # Coordinates
 #res.ind$contrib        # Contributions to the PCs
 #res.ind$cos2           # Quality of representation 
+
+# Pull first prin. component
+coord <- as.data.frame(res.ind$coord[,1])
+colnames(coord)[1] <- 'dim1'
+summary(coord$dim1) # median = 0.0967; mean = 0
+sd(coord$dim1) # 3.665649
+hist(coord$dim1, xlim = c(-20,15))
+hist(coord$dim1)
+
+coord <- as.data.frame(coord[which(coord$dim1 > -100),])
+colnames(coord)[1] <- 'dim1'
+summary(coord$dim1)
+
+ggplot(coord, aes(x=dim1)) + geom_histogram()
