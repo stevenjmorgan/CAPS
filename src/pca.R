@@ -214,7 +214,9 @@ colnames(year_state1d)[2] <- 'year'
 
 
 # Plot first dimension measure by year and state
-plot(year_state1d$year, year_state1d$x)
+#load('firstdim.RData')
+plot(year_state1d$year, year_state1d$x) # This is stupid, it's PCA, shouldn't plot aggregates
+plot(all.courts$year, all.courts$x) # Lol this is dumber
 
 
 ###
