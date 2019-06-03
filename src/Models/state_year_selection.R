@@ -68,6 +68,62 @@ ggsave('reg2_results.png')
 
 
 
+################################################################################
+### Correlates of State policy merge ###
+################################################################################
+uri <- "http://ippsr.msu.edu/sites/default/files/correlatesofstatepolicyprojectv2_1.csv"
+csp <- read.csv(uri)
+
+summary(csp$leg_cont) #1= Democrats Control Both Chambers; 0= Democrats Control Neither Chamber; .5= Democrats Control One Chamber, .25= Demcorats Split Control of One Chamber, .75= Democrats Control One Chamber and Split Control of the Other
+summary(csp$democrat) #Democratic Identifiers, 1956-2010 An over time measure of the percent of Democratic identifiers in each state
+summary(csp$general_expenditure) #General State Expenditures, 1942 - 2016 General State Expenditures. All state government finance data are in $1,000s of current dollars.
+
+# Merge in correlates data
+csp <- csp[,c('st','year','leg_cont','democrat','general_expenditure')]
+dim(year_state1d)
+year_state1d <- merge(year_state1d, csp, by.x = c('state.abb', 'year'), 
+           by.y = c('st','year'), all.x = TRUE)
+dim(year_state1d)
+
+# All selection methods
+state.leg.fit <- lm(x~apt+re+pe+freq+leg_cont+general_expenditure + as.factor(year) + as.factor(state),
+                    data = year_state1d)
+summary(state.leg.fit)
+
+m3_df <- tidy(state.leg.fit)  %>% 
+  filter(!grepl('as.fact*', term)) %>% 
+  filter(term != "(Intercept)")
+dwplot(m3_df, vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2)) %>%
+  relabel_predictors(c(apt = "Appointment",
+                       re = "Retention Election",          
+                       pe = "Partisan Election",
+                       freq = "Caseload",
+                       leg_cont = 'Dem. Leg.',
+                       general_expenditure = 'Gen. Expend.')) + xlab("Coefficient Estimate")
+ggsave('reg3_results.png')
+
+
+# Partisan and non-partisan vs. other
+state.leg.fit2 <- lm(x~pe.np+freq+leg_cont+general_expenditure + as.factor(year) + as.factor(state),
+                    data = year_state1d)
+summary(state.leg.fit2)
+
+m4_df <- tidy(state.leg.fit2)  %>% 
+  filter(!grepl('as.fact*', term)) %>% 
+  filter(term != "(Intercept)")
+dwplot(m4_df, vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2)) %>%
+  relabel_predictors(c(pe.np = "Partisan or Non-Partisan Elections",
+                       freq = "Caseload",
+                       leg_cont = 'Dem. Leg.',
+                       general_expenditure = 'Gen. Expend.')) + xlab("Coefficient Estimate")
+ggsave('reg4_results.png')
+
+
+
+
+################################################################################
+
+
 # Individual readability measures
 fit.ari <- lm(paste('ari',selection.formula, sep='~'),
               data = year_state1d)
