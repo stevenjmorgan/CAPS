@@ -11,6 +11,8 @@ library(ggplot2)
 state.courts <- read.csv('state_court_wide_final_bottom_half5-29.csv')
 state.courts2 <- read.csv('state_court_wide_final_top_half5-30.csv')
 all.courts <- rbind(state.courts,state.courts2)
+save(all.courts, file = 'combined_read_metrics.RData')
+
 
 # Subset dataset to only include opinions over over 100 words (removes 431,358 doc's)
 over100 <- all.courts[which(all.courts$word_count > 100),]
@@ -102,19 +104,44 @@ summary(over100$SMOG_R)
 hist(over100$SMOG_R[which(over100$SMOG_R < 30)])
 
 
+### Remove outliers
+all.courts <- all.courts[which(all.courts$flesch_R > -10 & all.courts$flesh_kincaid_R < 50 &
+                           all.courts$ARI_R < 50 & all.courts$RIX_R < 30 & 
+                           all.courts$Danielson_Bryan_R < 25 & all.courts$Dickes_Steiwer_R > -1000 &
+                           all.courts$ELF_R < 50 & all.courts$Farr_Jenkins_Paterson_R > -300 &
+                           all.courts$Fucks_R < 1000 & all.courts$FOG_R < 100 &
+                           all.courts$Linsear_Write_R < 100 & all.courts$nWS_R < 50 &
+                           all.courts$SMOG_R < 60),]
+
+# Reverse scale Flesh and Flesh-Kincaid scores (so that large values indicate higher readability)
+# new values = maximum value + minimum value - old values
+hist(all.courts$flesch_R)
+all.courts$flesch_R <- max(all.courts$flesch_R) + min(all.courts$flesch_R) - all.courts$flesch_R
+hist(all.courts$flesch_R)
+
+hist(all.courts$flesh_kincaid_R)
+all.courts$flesh_kincaid_R <- max(all.courts$flesh_kincaid_R) + min(all.courts$flesh_kincaid_R) - all.courts$flesh_kincaid_R
+hist(all.courts$flesh_kincaid_R)
+
+# Only include cases with at least 100 words
+all.courts <- all.courts[which(all.courts$word_count > 100),]
+  
 # Omit na values, subset readability metrics
 read.metrics <- na.omit(all.courts[,15:32])
 
 # Deal w/ infinte values
-read.metrics <- read.metrics[rowSums(is.infinite(as.matrix(read.metrics))) == 0,]
-rm(state.courts,state.courts2,all.courts)
+read.metrics <- read.metrics[rowSums(is.infinite(as.matrix(read.metrics))) == 0,] ### 1,624,698 cases
+rm(state.courts,state.courts2) #,all.courts)
+
+# Remove Coleman-Liau Short (quanteda does not calculate this correctly; it's the same as Coleman-Liau Grade)
+read.metrics <- subset(read.metrics, select = -c(Coleman_Liau_Short_R))
 
 # Calculate singular value decomposition
 read.pca <- prcomp(read.metrics, scale = TRUE)
 
 # Visualize eigenvalues (scree plot)
 fviz_eig(read.pca)
-ggsave('scree_plot_18.png')
+ggsave('scree_plot_all_read_measures.png')
 
 # Group by state, graph
 #fviz_pca_var(read.pca,
@@ -129,12 +156,14 @@ fviz_pca_var(read.pca,
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
              repel = TRUE     # Avoid text overlapping
 )
-ggsave('var_biplot.png')
+ggsave('var_biplot_all_read_measures.png')
 
+# Remove scientific notation
+options(scipen=999)
 
 ### Access PCA results
 # Eigenvalues
-eig.val <- get_eigenvalue(read.pca)
+eig.val <- get_eigenvalue(read.pca) # First dimension explains 85.4% of variance
 #eig.val
 
 # Results for Variables
@@ -152,13 +181,41 @@ res.ind <- get_pca_ind(read.pca)
 # Pull first prin. component
 coord <- as.data.frame(res.ind$coord[,1])
 colnames(coord)[1] <- 'dim1'
-summary(coord$dim1) # median = 0.0967; mean = 0
-sd(coord$dim1) # 3.665649
-hist(coord$dim1, xlim = c(-20,15))
-hist(coord$dim1)
+summary(coord$dim1) # median = 0.3402; mean = 0
+sd(coord$dim1) # 3.810639
+hist(coord$dim1)#, xlim = c(-20,15))
+hist(coord$dim1, xlim = c(-20, 20))
 
-coord <- as.data.frame(coord[which(coord$dim1 > -100),])
-colnames(coord)[1] <- 'dim1'
-summary(coord$dim1)
+#coord <- as.data.frame(coord[which(coord$dim1 > -100),])
+#colnames(coord)[1] <- 'dim1'
+#summary(coord$dim1)
 
-ggplot(coord, aes(x=dim1)) + geom_histogram()
+ggplot(coord, aes(x=dim1)) + geom_histogram(color="darkblue", fill="lightblue") +
+  geom_vline(data=coord, aes(xintercept=median(dim1), color="red"),
+             linetype="dashed") + xlim(-18, 18) + xlab('Dim. 1') + ylab('Count') + theme(legend.position='none')
+ggsave('hist_1st_dim.png')
+
+gc()
+
+# Add first dim. values as variable
+all.courts$first.dim <- coord$dim1
+save(all.courts, file = 'firstdim.RData')
+
+# Group by year-state median, sort by state
+all.courts$state <- as.character(all.courts$state)
+year_state1d <- aggregate(all.courts[,c('first.dim')], 
+                           list(all.courts$state, all.courts$year), median)
+colnames(year_state1d)[1] <- 'state'
+colnames(year_state1d)[2] <- 'year'
+
+load('combined_read_metrics.RData')
+
+library(plyr)
+
+all.courts$state <- as.character(all.courts$state)
+freq <- count(all.courts, vars=c("year","state"))
+year_state1d <- merge(year_state1d, freq, by = c('state','year'), all.x = TRUE)
+year_state1d <- year_state1d[order(year_state1d$state, year_state1d$year),]
+View(year_state1d)
+
+save(year_state1d, file = 'year_state_measures.RData')
