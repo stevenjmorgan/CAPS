@@ -195,11 +195,15 @@ ggplot(coord, aes(x=dim1)) + geom_histogram(color="darkblue", fill="lightblue") 
              linetype="dashed") + xlim(-18, 18) + xlab('Dim. 1') + ylab('Count') + theme(legend.position='none')
 ggsave('hist_1st_dim.png')
 
+
 gc()
+
+
 
 # Add first dim. values as variable
 all.courts$first.dim <- coord$dim1
 save(all.courts, file = 'firstdim.RData')
+
 
 # Group by year-state median, sort by state
 all.courts$state <- as.character(all.courts$state)
@@ -208,6 +212,12 @@ year_state1d <- aggregate(all.courts[,c('first.dim')],
 colnames(year_state1d)[1] <- 'state'
 colnames(year_state1d)[2] <- 'year'
 
+
+# Plot first dimension measure by year and state
+plot(year_state1d$year, year_state1d$x)
+
+
+###
 load('combined_read_metrics.RData')
 
 library(plyr)
@@ -219,3 +229,6 @@ year_state1d <- year_state1d[order(year_state1d$state, year_state1d$year),]
 View(year_state1d)
 
 save(year_state1d, file = 'year_state_measures.RData')
+
+
+
