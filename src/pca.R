@@ -274,6 +274,7 @@ ggplot(tgc, aes(x=year, y=first.dim)) +
 ggsave('all_years_first_dim.png')
 
 
+
 # Standard error of the mean
 
 ###
