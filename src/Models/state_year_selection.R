@@ -75,6 +75,7 @@ uri <- "http://ippsr.msu.edu/sites/default/files/correlatesofstatepolicyprojectv
 csp <- read.csv(uri)
 
 summary(csp$leg_cont) #1= Democrats Control Both Chambers; 0= Democrats Control Neither Chamber; .5= Democrats Control One Chamber, .25= Demcorats Split Control of One Chamber, .75= Democrats Control One Chamber and Split Control of the Other
+# 1937-2011
 summary(csp$democrat) #Democratic Identifiers, 1956-2010 An over time measure of the percent of Democratic identifiers in each state
 summary(csp$general_expenditure) #General State Expenditures, 1942 - 2016 General State Expenditures. All state government finance data are in $1,000s of current dollars.
 
