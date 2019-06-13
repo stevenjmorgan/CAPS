@@ -258,19 +258,23 @@ summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
 tgc <- summarySE(all.courts[which(all.courts$state == 'Massachusetts'),], 
                  measurevar="first.dim" , groupvars=c("year"))
 # Standard error of the mean
-ggplot(tgc, aes(x=year, y=first.dim)) + 
+ggplot(tgc[which(tgc$year > 1775),], aes(x=year, y=first.dim)) + 
   geom_errorbar(aes(ymin=first.dim-se, ymax=first.dim+se), width=.1) +
   #geom_line() +
-  geom_point() + xlab('Year') + ylab('Dim. 1')
+  geom_point() + xlab('Year') + ylab('Readability') +
+  theme_bw() + 
+  theme(text = element_text(size=25))
 ggsave('ma_first_dim.png')
 #ggplot(data=all.courts[which(all.courts$state == 'Massachusetts'),], aes(x=year,y=first.dim)) + geom_point()
 
 tgc <- summarySE(all.courts, 
                  measurevar="first.dim" , groupvars=c("year"))
-ggplot(tgc, aes(x=year, y=first.dim)) + 
+ggplot(tgc[which(tgc$year > 1775),], aes(x=year, y=first.dim)) + 
   geom_errorbar(aes(ymin=first.dim-se, ymax=first.dim+se), width=.1) +
   #geom_line() +
-  geom_point() + xlab('Year') + ylab('Dim. 1')
+  geom_point() + xlab('Year') + ylab('Readability') +
+  theme_bw() + 
+  theme(text = element_text(size=25))
 ggsave('all_years_first_dim.png')
 
 

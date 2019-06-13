@@ -41,12 +41,18 @@ library(dplyr)
 
 m1_df <- tidy(fit.1d)  %>% 
   filter(!grepl('as.fact*', term)) %>% 
-  filter(term != "(Intercept)")
-dwplot(m1_df, vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2)) %>%
+  filter(term != "(Intercept)") %>% 
+  filter(term != "freq")
+dwplot(m1_df,dot_args = list(size = 3.5, pch = 21, fill = "white", col = 'black'),
+       vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2),
+       whisker_args = list(size = 3.5, col = 'red')) %>%
   relabel_predictors(c(apt = "Appointment",
                        re = "Retention Election",          
-                       pe = "Partisan Election",
-                       freq = "Caseload")) + xlab("Coefficient Estimate")
+                       pe = "Partisan Election")) + #,
+                       #freq = "Caseload")) 
+    xlab("Coefficient Estimate") +
+  theme_bw() +
+  theme(text = element_text(size=25))
 ggsave('reg1_results.png')
 
 
@@ -94,13 +100,16 @@ summary(state.leg.fit)
 m3_df <- tidy(state.leg.fit)  %>% 
   filter(!grepl('as.fact*', term)) %>% 
   filter(term != "(Intercept)")
-dwplot(m3_df, vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2)) %>%
+dwplot(m3_df, dot_args = list(size = 3.5, pch = 21, fill = "white", col = 'black'), 
+       vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2), whisker_args = list(size = 3.5, col = 'red')) %>%
   relabel_predictors(c(apt = "Appointment",
                        re = "Retention Election",          
                        pe = "Partisan Election",
                        freq = "Caseload",
                        leg_cont = 'Dem. Leg.',
-                       general_expenditure = 'Gen. Expend.')) + xlab("Coefficient Estimate")
+                       general_expenditure = 'Gen. Expend.')) + xlab("Coefficient Estimate") +
+  theme_bw() +
+  theme(text = element_text(size=25))
 ggsave('reg3_results.png')
 
 
