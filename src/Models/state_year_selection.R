@@ -2,14 +2,15 @@
 # data, and models opinion quality.
 
 rm(list=ls())
-setwd("C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP")
+#setwd("C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP")
 #setwd("C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP")
+setwd('C:/Users/steve/Desktop/APSA_Paper')
 
 library(readstata13)
 library(datasets)
 library(stargazer)
 
-#load('year_state_measures.RData')
+load('year_state_measures.RData')
 
 # Read in selection method data
 judSel <- read.dta13('judSelHist.dta')
@@ -34,6 +35,9 @@ selection.formula <- paste('apt','re','pe','freq','as.factor(state)','as.factor(
 fit.1d <- lm(paste('x',selection.formula, sep='~'),
               data = year_state1d)
 summary(fit.1d)
+
+stargazer(fit.1d, single.row = TRUE)
+
 
 library(dotwhisker)
 library(broom)
@@ -96,6 +100,7 @@ dim(year_state1d)
 state.leg.fit <- lm(x~apt+re+pe+freq+leg_cont+general_expenditure + as.factor(year) + as.factor(state),
                     data = year_state1d)
 summary(state.leg.fit)
+stargazer(state.leg.fit)
 
 m3_df <- tidy(state.leg.fit)  %>% 
   filter(!grepl('as.fact*', term)) %>% 
