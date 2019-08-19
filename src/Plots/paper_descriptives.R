@@ -159,3 +159,9 @@ colnames(wc.dec)[colnames(wc.dec) == 'mean(word_count)'] <- 'average_wc'
 ggplot(wc.dec, aes(x=decade,y=average_wc)) + geom_point() +
   xlab('Decade') + ylab('Average Word Count') + theme_bw()
 ggsave('average_wc_dec.png')
+
+
+
+# Group by year citations
+cites.yr <- wide %>% group_by(year) %>%
+  summarise(mean(citations))

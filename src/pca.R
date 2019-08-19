@@ -223,6 +223,27 @@ all.courts$first.dim <- coord$dim1
 save(all.courts, file = 'firstdim.RData')
 
 
+top.example <- all.courts[max(all.courts$first.dim),]
+low.example <- all.courts[min(all.courts$first.dim),]
+set.seed(24519)
+low.example <- low.example[sample(nrow(low.example),1),]
+low.example$word_count
+
+ex <- mean(all.courts$first.dim) - sd(coord$dim1)
+low.example <- all.courts[which(all.courts$first.dim < ex),]
+low.example <- low.example[order(low.example$first.dim, decreasing = T),]
+low.example <- low.example[which(low.example$word_count > 500),]
+low.example <- low.example[7,]
+low.example$cite
+
+ex2 <- mean(all.courts$first.dim) + sd(coord$dim1)
+top.example <- all.courts[which(all.courts$first.dim > ex2),]
+top.example <- top.example[order(top.example$first.dim, decreasing = T),]
+top.example <- top.example[which(top.example$word_count > 500),]
+top.example <- top.example[4,]
+top.example$cite
+
+
 # Group by year-state median, sort by state
 all.courts$state <- as.character(all.courts$state)
 year_state1d <- aggregate(all.courts[,c('first.dim')], 
