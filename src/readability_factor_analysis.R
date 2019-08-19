@@ -205,6 +205,7 @@ year_state_1f <- year_state_1f[order(year_state_1f$state, year_state_1f$year),]
 View(year_state_1f)
 
 save(year_state_1f, file = 'year_state_measures.RData')
+load('year_state_measures.RData')
 
 
 ### Plot average factor score by decade by state
