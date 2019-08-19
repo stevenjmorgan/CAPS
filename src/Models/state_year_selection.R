@@ -2,9 +2,9 @@
 # data, and models opinion quality.
 
 rm(list=ls())
-#setwd("C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP")
+setwd("C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP")
 #setwd("C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP")
-setwd('C:/Users/steve/Desktop/APSA_Paper')
+#setwd('C:/Users/steve/Desktop/APSA_Paper')
 
 library(readstata13)
 library(datasets)

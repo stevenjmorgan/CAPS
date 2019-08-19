@@ -1,8 +1,8 @@
 ### This script applies PCA to the state court readability measures.
 
 rm(list=ls())
-setwd("C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP")
-#setwd("C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP")
+#setwd("C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP")
+setwd("C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP")
 
 library(factoextra)
 library(ggplot2)
@@ -12,10 +12,24 @@ state.courts <- read.csv('state_court_wide_final_bottom_half5-29.csv')
 state.courts2 <- read.csv('state_court_wide_final_top_half5-30.csv')
 all.courts <- rbind(state.courts,state.courts2)
 save(all.courts, file = 'combined_read_metrics.RData')
+load('C:/Users/sum410/Downloads/combined_read_metrics.RData')
+dim(all.courts)
 
 
-# Subset dataset to only include opinions over over 100 words (removes 431,358 doc's)
-over100 <- all.courts[which(all.courts$word_count > 100),]
+# Subset dataset to only include opinions over over 50 words (removes 431,358 doc's)
+over100 <- all.courts[which(all.courts$word_count > 50),]
+over100 <- over100[which(over100$year >= 1776),]
+dim(over100)
+over100$state <- as.character(over100$state)
+
+# Top states
+top.states <- over100 %>%
+  group_by(state) %>%
+  summarize(n())
+sum(top.states$`n()`) == nrow(over100)
+top.states <- top.states[order(top.states$`n()`, decreasing = T),]
+head(top.states)
+
 
 # Omit na values, subset readability metrics
 read.metrics <- na.omit(all.courts[,15:32])
@@ -135,12 +149,15 @@ rm(state.courts,state.courts2) #,all.courts)
 
 # Remove Coleman-Liau Short (quanteda does not calculate this correctly; it's the same as Coleman-Liau Grade)
 read.metrics <- subset(read.metrics, select = -c(Coleman_Liau_Short_R))
+dim(read.metrics)
+colnames(read.metrics)
+
 
 # Calculate singular value decomposition
 read.pca <- prcomp(read.metrics, scale = TRUE)
 
 # Visualize eigenvalues (scree plot)
-fviz_eig(read.pca)
+fviz_eig(read.pca, ncp = 5, main = '')
 ggsave('scree_plot_all_read_measures.png')
 
 # Group by state, graph
@@ -185,6 +202,7 @@ summary(coord$dim1) # median = 0.3402; mean = 0
 sd(coord$dim1) # 3.810639
 hist(coord$dim1)#, xlim = c(-20,15))
 hist(coord$dim1, xlim = c(-20, 20))
+
 
 #coord <- as.data.frame(coord[which(coord$dim1 > -100),])
 #colnames(coord)[1] <- 'dim1'
