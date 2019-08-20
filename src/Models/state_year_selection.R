@@ -2,8 +2,8 @@
 # data, and models opinion quality.
 
 rm(list=ls())
-setwd("C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP")
-#setwd("C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP")
+#setwd("C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP")
+setwd("C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP")
 #setwd('C:/Users/steve/Desktop/APSA_Paper')
 
 library(readstata13)
@@ -104,15 +104,19 @@ stargazer(state.leg.fit)
 
 m3_df <- tidy(state.leg.fit)  %>% 
   filter(!grepl('as.fact*', term)) %>% 
-  filter(term != "(Intercept)")
+  filter(term != "(Intercept)") %>% 
+  filter(term != "(leg_cont)") %>% 
+  filter(term != "(freq)") %>% 
+  filter(term != "(general_expenditure)")
 dwplot(m3_df, dot_args = list(size = 3.5, pch = 21, fill = "white", col = 'black'), 
        vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2), whisker_args = list(size = 3.5, col = 'red')) %>%
   relabel_predictors(c(apt = "Appointment",
                        re = "Retention Election",          
-                       pe = "Partisan Election",
-                       freq = "Caseload",
-                       leg_cont = 'Dem. Leg.',
-                       general_expenditure = 'Gen. Expend.')) + xlab("Coefficient Estimate") +
+                       pe = "Partisan Election"#,
+                       #freq = "Caseload",
+                       #leg_cont = 'Dem. Leg.',
+                       #general_expenditure = 'Gen. Expend.'
+                       )) + xlab("Coefficient Estimate") +
   theme_bw() +
   theme(text = element_text(size=25))
 ggsave('reg3_results.png')

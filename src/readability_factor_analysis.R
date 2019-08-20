@@ -512,3 +512,26 @@ stargazer(m1, omit=c('year','state'),
           covariate.labels = c('Appointed', 'Retention Election', 
                                'Partisan Election', 'Caseload', 
                                'Legislature Control', 'General Expenditure'))
+
+library(dotwhisker)
+library(broom)
+library(dplyr)
+
+
+m1_df <- tidy(m1)  %>% 
+  filter(!grepl('as.fact*', term)) %>% 
+  filter(term != "(Intercept)") %>% 
+  filter(term != "freq") %>% 
+  filter(term != "leg_cont") %>% 
+  filter(term != "general_expenditure")
+dwplot(m1_df,dot_args = list(size = 3.5, pch = 21, fill = "white", col = 'black'),
+       vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2),
+       whisker_args = list(size = 3.5, col = 'red')) %>%
+  relabel_predictors(c(apt = "Appointment",
+                       re = "Retention Election",          
+                       pe = "Partisan Election")) + #,
+  #freq = "Caseload")) 
+  xlab("Coefficient Estimate") +
+  theme_bw() +
+  theme(text = element_text(size=25))
+ggsave('citation_state_results.png')
