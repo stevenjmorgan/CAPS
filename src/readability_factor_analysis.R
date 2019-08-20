@@ -491,3 +491,24 @@ dim(year_state1d)
 year_state1d <- merge(year_state1d, csp, by.x = c('state.abb', 'year'), 
                       by.y = c('st','year'), all.x = TRUE)
 dim(year_state1d)
+
+
+## Models
+state.leg.fit <- lm(median_cites~apt+re+pe+freq+leg_cont+general_expenditure + as.factor(year) + as.factor(state),
+                    data = year_state1d)
+summary(state.leg.fit)
+library(stargazer)
+stargazer(state.leg.fit, omit=c('year','state'),
+          dep.var.labels = c('Number of Citations'),
+          covariate.labels = c('Appointed', 'Retention Election', 
+                               'Partisan Election', 'Caseload', 
+                               'Legislature Control', 'General Expenditure'))
+
+m1 <- glm(median_cites~apt+re+pe+freq+leg_cont+general_expenditure + as.factor(year) + as.factor(state),
+          data = year_state1d, family="poisson")
+summary(m1)
+stargazer(m1, omit=c('year','state'),
+          dep.var.labels = c('Number of Citations'),
+          covariate.labels = c('Appointed', 'Retention Election', 
+                               'Partisan Election', 'Caseload', 
+                               'Legislature Control', 'General Expenditure'))
