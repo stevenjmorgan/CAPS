@@ -455,7 +455,9 @@ colnames(year_state1d)[2] <- 'year'
 colnames(year_state1d)[3] <- 'median_cites'
 
 all_cases$state <- as.character(all_cases$state)
-freq <- count(all_cases, vars=c("year","state"))
+class(all_cases$year)
+library(plyr)
+freq <- plyr::count(all_cases, vars=c("year","state"))
 year_state1d <- merge(year_state1d, freq, by = c('state','year'), all.x = TRUE)
 year_state1d <- year_state1d[order(year_state1d$state, year_state1d$year),]
 View(year_state1d)
@@ -520,18 +522,21 @@ library(dplyr)
 
 m1_df <- tidy(m1)  %>% 
   filter(!grepl('as.fact*', term)) %>% 
-  filter(term != "(Intercept)") %>% 
-  filter(term != "freq") %>% 
-  filter(term != "leg_cont") %>% 
-  filter(term != "general_expenditure")
-dwplot(m1_df,dot_args = list(size = 3.5, pch = 21, fill = "white", col = 'black'),
-       vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2),
-       whisker_args = list(size = 3.5, col = 'red')) %>%
+  filter(term != "(Intercept)")# %>% 
+  #filter(term != "freq") %>% 
+  #filter(term != "leg_cont") %>% 
+  #filter(term != "general_expenditure")
+dwplot(m1_df,#dot_args = list(size = 3.5, pch = 21, fill = "white", col = 'black'),
+       vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2)) %>%#,
+       #whisker_args = list(size = 3.5, col = 'red')) %>%
   relabel_predictors(c(apt = "Appointment",
                        re = "Retention Election",          
-                       pe = "Partisan Election")) + #,
+                       pe = "Partisan Election",
+                       freq = 'Caseload',
+                       leg_cont = 'Dem. Leg.',
+                       general_expenditure = 'State Expenditures')) + #,
   #freq = "Caseload")) 
-  xlab("Coefficient Estimate") +
-  theme_bw() +
-  theme(text = element_text(size=25))
+  xlab("Coefficient Estimate") + ggtitle('Citations Model Results')#+
+  #theme_bw() +
+  #theme(text = element_text(size=25))
 ggsave('citation_state_results.png')

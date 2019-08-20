@@ -32,7 +32,7 @@ year_state1d <- merge(year_state1d, judSel, by.x = c('state.abb','year'),
 colnames(year_state1d)
 selection.formula <- paste('apt','re','pe','freq','as.factor(state)','as.factor(year)', sep = '+')
 
-fit.1d <- lm(paste('x',selection.formula, sep='~'),
+fit.1d <- lm(paste('median_cites',selection.formula, sep='~'),
               data = year_state1d)
 summary(fit.1d)
 
@@ -45,18 +45,18 @@ library(dplyr)
 
 m1_df <- tidy(fit.1d)  %>% 
   filter(!grepl('as.fact*', term)) %>% 
-  filter(term != "(Intercept)") %>% 
-  filter(term != "freq")
-dwplot(m1_df,dot_args = list(size = 3.5, pch = 21, fill = "white", col = 'black'),
-       vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2),
-       whisker_args = list(size = 3.5, col = 'red')) %>%
+  filter(term != "(Intercept)")# %>% 
+  #filter(term != "freq")
+dwplot(m1_df,#dot_args = list(size = 3.5, pch = 21, fill = "white", col = 'black'),
+       vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2)) %>%
+       #whisker_args = list(size = 3.5, col = 'red')) %>%
   relabel_predictors(c(apt = "Appointment",
                        re = "Retention Election",          
-                       pe = "Partisan Election")) + #,
-                       #freq = "Caseload")) 
-    xlab("Coefficient Estimate") +
-  theme_bw() +
-  theme(text = element_text(size=25))
+                       pe = "Partisan Election",#)) + #,
+                       freq = "Caseload")) +
+    xlab("Coefficient Estimate") + ggtitle('Median Citation Results')
+  #theme_bw() +
+  #theme(text = element_text(size=25))
 ggsave('reg1_results.png')
 
 
@@ -104,22 +104,28 @@ stargazer(state.leg.fit)
 
 m3_df <- tidy(state.leg.fit)  %>% 
   filter(!grepl('as.fact*', term)) %>% 
-  filter(term != "(Intercept)") %>% 
-  filter(term != "(leg_cont)") %>% 
-  filter(term != "(freq)") %>% 
-  filter(term != "(general_expenditure)")
-dwplot(m3_df, dot_args = list(size = 3.5, pch = 21, fill = "white", col = 'black'), 
-       vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2), whisker_args = list(size = 3.5, col = 'red')) %>%
+  filter(term != "(Intercept)")# %>% 
+  #filter(term != "leg_cont") %>% 
+  #filter(term != "freq") %>% 
+  #filter(term != "general_expenditure")
+dwplot(m3_df, vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2)) %>%#dot_args = list(size = 3.5, pch = 21, fill = "white", col = 'black'), 
+       #vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2), whisker_args = list(size = 3.5, col = 'red')) %>%
   relabel_predictors(c(apt = "Appointment",
                        re = "Retention Election",          
-                       pe = "Partisan Election"#,
-                       #freq = "Caseload",
-                       #leg_cont = 'Dem. Leg.',
-                       #general_expenditure = 'Gen. Expend.'
+                       pe = "Partisan Election",
+                       freq = "Caseload",
+                       leg_cont = 'Dem. Leg.',
+                       general_expenditure = 'State Expend.'
                        )) + xlab("Coefficient Estimate") +
-  theme_bw() +
-  theme(text = element_text(size=25))
-ggsave('reg3_results.png')
+                        ggtitle('Readability Model Results')# +
+  #theme_bw() +
+  #theme(text = element_text(size=25))
+ggsave('readability_state_dotplot.png')
+
+dwplot(m2_df, vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2)) %>%
+  relabel_predictors(c(pe.np = "Partisan or Non-Partisan Elections",
+                       freq = "Caseload")) + xlab("Coefficient Estimate")
+
 
 
 # Partisan and non-partisan vs. other
