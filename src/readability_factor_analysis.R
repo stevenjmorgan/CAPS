@@ -20,9 +20,11 @@ library(plyr)
 all_cases <- read.csv('state_court_wide_final4-23.csv')
 
 all_cases <- all_cases[which(all_cases$year >= 1776),]
+all_cases <- all_cases[which(all_cases$word_count > 100),]
 summary(all_cases$pos_cites)
 all_cases$pos_cites[is.na(all_cases$pos_cites)] <- 0
 all_cases$neg_cites[is.na(all_cases$neg_cites)] <- 0
+summary(all_cases$number_cites)
 
 #setwd("C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/Min50")
 
@@ -444,3 +446,48 @@ for (i in 1:nrow(all_cases)) {
 }
 
 
+
+#### Create df at state-year level for median citations 
+year_state1d <- aggregate(all_cases[,c('number_cites')], 
+                          list(all_cases$state, all_cases$year), median)
+colnames(year_state1d)[1] <- 'state'
+colnames(year_state1d)[2] <- 'year'
+colnames(year_state1d)[3] <- 'median_cites'
+
+all_cases$state <- as.character(all_cases$state)
+freq <- count(all_cases, vars=c("year","state"))
+year_state1d <- merge(year_state1d, freq, by = c('state','year'), all.x = TRUE)
+year_state1d <- year_state1d[order(year_state1d$state, year_state1d$year),]
+View(year_state1d)
+
+# Read in selection method data
+library(readstata13)
+judSel <- read.dta13('judSelHist.dta')
+
+# Remove NA's
+judSel <- judSel[!is.na(judSel$apt),]
+
+# Read in states dataset
+states <- as.data.frame(cbind(state.abb, state.name))
+
+# Merge in abbreviations
+year_state1d <- merge(year_state1d, states, by.x = 'state', by.y = 'state.name',
+                      all.x = TRUE)
+year_state1d <- merge(year_state1d, judSel, by.x = c('state.abb','year'), 
+                      by.y = c('stateabbr','year'), all.x = TRUE)
+
+### Merge CofSP data
+uri <- "http://ippsr.msu.edu/sites/default/files/correlatesofstatepolicyprojectv2_1.csv"
+csp <- read.csv(uri)
+
+summary(csp$leg_cont) #1= Democrats Control Both Chambers; 0= Democrats Control Neither Chamber; .5= Democrats Control One Chamber, .25= Demcorats Split Control of One Chamber, .75= Democrats Control One Chamber and Split Control of the Other
+# 1937-2011
+summary(csp$democrat) #Democratic Identifiers, 1956-2010 An over time measure of the percent of Democratic identifiers in each state
+summary(csp$general_expenditure) #General State Expenditures, 1942 - 2016 General State Expenditures. All state government finance data are in $1,000s of current dollars.
+
+# Merge in correlates data
+csp <- csp[,c('st','year','leg_cont','democrat','general_expenditure')]
+dim(year_state1d)
+year_state1d <- merge(year_state1d, csp, by.x = c('state.abb', 'year'), 
+                      by.y = c('st','year'), all.x = TRUE)
+dim(year_state1d)
