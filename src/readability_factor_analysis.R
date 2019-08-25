@@ -540,3 +540,19 @@ dwplot(m1_df,#dot_args = list(size = 3.5, pch = 21, fill = "white", col = 'black
   #theme_bw() +
   #theme(text = element_text(size=25))
 ggsave('citation_state_results.png')
+
+### Presentation fig
+dwplot(m1_df,dot_args = list(size = 3.5, pch = 21, fill = "red", col = 'black'),
+       vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2)) %>%#,
+  #whisker_args = list(size = 3.5, col = 'red')) %>%
+  relabel_predictors(c(apt = "Appointment",
+                       re = "Retention Election",          
+                       pe = "Partisan Election",
+                       freq = 'Caseload',
+                       leg_cont = 'Dem. Leg.',
+                       general_expenditure = 'State Expenditures')) + #,
+  #freq = "Caseload")) 
+  xlab("Coefficient Estimate") + #+ ggtitle('Citations Model Results')#+
+ theme_bw() +
+ theme(text = element_text(size=25))
+ggsave('citation_state_results_pres.png')
