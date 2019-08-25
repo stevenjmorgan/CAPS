@@ -127,6 +127,28 @@ dwplot(m3_df, vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2
   #theme(text = element_text(size=25))
 ggsave('readability_state_dotplot.png')
 
+
+### Presentation fig
+dwplot(m3_df,dot_args = list(size = 3.5, pch = 21, fill = "red", col = 'black'),
+       vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2)) %>%#,
+  #whisker_args = list(size = 3.5, col = 'red')) %>%
+  relabel_predictors(c(apt = "Appointment",
+                       re = "Retention Election",          
+                       pe = "Partisan Election",
+                       freq = 'Caseload',
+                       leg_cont = 'Dem. Leg.',
+                       general_expenditure = 'State Expenditures')) + #,
+  #freq = "Caseload")) 
+  xlab("Coefficient Estimate") + #+ ggtitle('Citations Model Results')#+
+  theme_bw() +
+  theme(text = element_text(size=25))
+ggsave('readability_state_results_pres.png')
+
+##################
+
+
+
+
 dwplot(m2_df, vline = geom_vline(xintercept = 0, colour = "grey60", linetype = 2)) %>%
   relabel_predictors(c(pe.np = "Partisan or Non-Partisan Elections",
                        freq = "Caseload")) + xlab("Coefficient Estimate")

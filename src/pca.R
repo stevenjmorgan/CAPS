@@ -12,7 +12,7 @@ state.courts <- read.csv('state_court_wide_final_bottom_half5-29.csv')
 state.courts2 <- read.csv('state_court_wide_final_top_half5-30.csv')
 all.courts <- rbind(state.courts,state.courts2)
 save(all.courts, file = 'combined_read_metrics.RData')
-load('C:/Users/sum410/Downloads/combined_read_metrics.RData')
+#load('C:/Users/sum410/Downloads/combined_read_metrics.RData')
 dim(all.courts)
 
 
@@ -294,8 +294,9 @@ summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
   
   return(datac)
 }
-tgc <- summarySE(all.courts[which(all.courts$state == 'Massachusetts'),], 
+tgc <- summarySE(all.courts[which(all.courts$state == 'Maryland'),], 
                  measurevar="first.dim" , groupvars=c("year"))
+
 # Standard error of the mean
 ggplot(tgc[which(tgc$year > 1775),], aes(x=year, y=first.dim)) + 
   geom_errorbar(aes(ymin=first.dim-se, ymax=first.dim+se), width=.1) +
@@ -303,7 +304,7 @@ ggplot(tgc[which(tgc$year > 1775),], aes(x=year, y=first.dim)) +
   geom_point() + xlab('Year') + ylab('Readability') +
   theme_bw() + 
   theme(text = element_text(size=25))
-ggsave('ma_first_dim.png')
+ggsave('MD_first_dim.png')
 #ggplot(data=all.courts[which(all.courts$state == 'Massachusetts'),], aes(x=year,y=first.dim)) + geom_point()
 
 tgc <- summarySE(all.courts, 
