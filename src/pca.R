@@ -326,7 +326,7 @@ load('combined_read_metrics.RData')
 library(plyr)
 
 all.courts$state <- as.character(all.courts$state)
-freq <- count(all.courts, vars=c("year","state"))
+freq <- plyr::count(all.courts, vars=c("year","state"))
 year_state1d <- merge(year_state1d, freq, by = c('state','year'), all.x = TRUE)
 year_state1d <- year_state1d[order(year_state1d$state, year_state1d$year),]
 View(year_state1d)

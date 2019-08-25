@@ -32,9 +32,14 @@ year_state1d <- merge(year_state1d, judSel, by.x = c('state.abb','year'),
 colnames(year_state1d)
 selection.formula <- paste('apt','re','pe','freq','as.factor(state)','as.factor(year)', sep = '+')
 
-fit.1d <- lm(paste('median_cites',selection.formula, sep='~'),
-              data = year_state1d)
+fit.1d <- lm(paste('x',selection.formula, sep='~'),
+             data = year_state1d)
 summary(fit.1d)
+
+
+#fit.1d <- lm(paste('median_cites',selection.formula, sep='~'),
+#              data = year_state1d)
+#summary(fit.1d)
 
 stargazer(fit.1d, single.row = TRUE)
 
