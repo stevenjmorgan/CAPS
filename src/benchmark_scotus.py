@@ -217,6 +217,7 @@ columns = ['file_id', 'year',
            'SMOG_R', 'Strain_R', 'Wheeler_Smith_R']
 
 rows_list = []
+case_num = 0
 with open(files[0]) as f:
 
     for line in f:
@@ -273,7 +274,9 @@ with open(files[0]) as f:
                                Strain_R = Strain_R,
                                Wheeler_Smith_R = Wheeler_Smith_R)
                 rows_list.append(court_d)
-                break
+                
+                case_num += 1
+                print(case_num)
 
             except:
                 pass
