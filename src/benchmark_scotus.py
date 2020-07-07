@@ -182,12 +182,14 @@ def dale_chall_readability_score(text):
 
 # Set working directory
 #os.chdir('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/')
-os.chdir('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/')
+#os.chdir('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/')
+os.chdir(r'C:\Users\SF515-51T\Desktop\CAPS')
+
 
 #files = list(glob.glob(os.path.join('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/SCOTUS_Data/','*.*')))
-files = list(glob.glob(os.path.join('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/SCOTUS_Data/','*.*')))
+files = list(glob.glob(os.path.join('C:/Users/SF515-51T/Dropbox/PSU2018-2019/RA/CAP/SCOTUS_Data/','*.*')))
 #states = [x.split('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/SCOTUS_Data')[1] for x in files]
-states = [x.split('C:/Users/sum410/Dropbox/PSU2018-2019/RA/CAP/SCOTUS_Data')[1] for x in files]
+states = [x.split('C:/Users/SF515-51T/Dropbox/PSU2018-2019/RA/CAP/SCOTUS_Data')[1] for x in files]
 states = [x.replace("\\", "") for x in states]
 states = [x.replace(".jsonl", "") for x in states]
 
@@ -195,3 +197,6 @@ state_high_list = ['United States Supreme Court',
                    'Supreme Court of United States',
                    'United State Supreme Court',
                    'Supreme Court of the United States']
+
+
+
