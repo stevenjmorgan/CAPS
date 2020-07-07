@@ -187,11 +187,12 @@ os.chdir(r'C:\Users\SF515-51T\Desktop\CAPS')
 
 
 #files = list(glob.glob(os.path.join('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/SCOTUS_Data/','*.*')))
-files = list(glob.glob(os.path.join('C:/Users/SF515-51T/Dropbox/PSU2018-2019/RA/CAP/SCOTUS_Data/','*.*')))
+files = list(glob.glob(os.path.join('C:/Users/SF515-51T/Dropbox/PSU2018-2019/RA/CAP/SCOTUS_Data','*.*')))
 #states = [x.split('C:/Users/steve/Dropbox/PSU2018-2019/RA/CAP/SCOTUS_Data')[1] for x in files]
 states = [x.split('C:/Users/SF515-51T/Dropbox/PSU2018-2019/RA/CAP/SCOTUS_Data')[1] for x in files]
 states = [x.replace("\\", "") for x in states]
 states = [x.replace(".jsonl", "") for x in states]
+files[0] = files[0].replace('\\', '/')
 
 state_high_list = ['United States Supreme Court', 
                    'Supreme Court of United States',
@@ -199,4 +200,84 @@ state_high_list = ['United States Supreme Court',
                    'Supreme Court of the United States']
 
 
+# Import quanteda from R
+quanteda = importr('quanteda')
+
+# Create dictionary to store results
+file_d = {}
+columns = ['file_id', 'year', 
+           'flesch', 'flesch_kincaid', 'gunning_fog', 'smog', 'ari', 
+           'coleman_liau', 'state', 'word_count', 'number_cites', 'citations',
+           'pos_cites', 'neg_cites', 'has_opinion', 'total_opins', 'greater50',
+           'opin_author', 'judges', 'sentence_len', 'sentence_30', 
+           'ARI_R', 'RIX_R', 'Coleman_Liau_Grade_R', 'Coleman_Liau_Short_R',
+           'Danielson_Bryan_R', 'Dickes_Steiwer_R', 'ELF_R', 
+           'Farr_Jenkins_Paterson_R', 'flesch_R', 'flesh_kincaid_R',
+           'FORCAST_R', 'Fucks_R', 'FOG_R', 'Linsear_Write_R', 'nWS_R', 
+           'SMOG_R', 'Strain_R', 'Wheeler_Smith_R']
+
+rows_list = []
+with open(files[0]) as f:
+
+    for line in f:
+        
+        data = json.loads(line)
+        
+        if (data['court']['name'] in state_high_list) and len(data['casebody']['data']['opinions']) > 0:
+        
+            court_d = {}            
+            case_year = data['decision_date'][0:4]
+            w_count = len(data['casebody']['data']['opinions'][0]['text'].split())
+    
+            # R-based calculations of readability
+            try:
+                r_read_mets = quanteda.textstat_readability(data['casebody']['data']['opinions'][0]['text'].replace('\n', ' '), measure = 'all')
+                
+                ari_r = float(r_read_mets[1].r_repr())
+                rix_r = float(r_read_mets[35].r_repr())
+                Coleman_Liau_Grade_R = float(r_read_mets[9].r_repr())
+                Coleman_Liau_Short_R = float(r_read_mets[10].r_repr())
+                Danielson_Bryan_R = float(r_read_mets[14].r_repr())
+                Dickes_Steiwer_R = float(r_read_mets[16].r_repr())
+                ELF_R = float(r_read_mets[18].r_repr())
+                Farr_Jenkins_Paterson_R = float(r_read_mets[19].r_repr())
+                flesch_R = float(r_read_mets[20].r_repr())
+                flesh_kincaid_R = float(r_read_mets[22].r_repr())
+                FORCAST_R = float(r_read_mets[26].r_repr())
+                Fucks_R = float(r_read_mets[28].r_repr())
+                FOG_R = float(r_read_mets[23].r_repr())
+                Linsear_Write_R = float(r_read_mets[29].r_repr())
+                nWS_R = float(r_read_mets[31].r_repr())
+                SMOG_R = float(r_read_mets[37].r_repr())
+                Strain_R = float(r_read_mets[43].r_repr())
+                Wheeler_Smith_R = float(r_read_mets[46].r_repr())
+
+                court_d.update(court = data['court']['name'], 
+                               date = data['decision_date'], 
+                               cite = data['citations'][0]['cite'], 
+                               case = data['name'], 
+                               year = case_year, 
+                               word_count = w_count,
+                               has_opinion = 1,
+                               ARI_R = ari_r, RIX_R = rix_r,
+                               Coleman_Liau_Grade_R = Coleman_Liau_Grade_R,
+                               Coleman_Liau_Short_R = Coleman_Liau_Short_R,
+                               Danielson_Bryan_R = Danielson_Bryan_R,
+                               Dickes_Steiwer_R = Dickes_Steiwer_R,
+                               ELF_R = ELF_R, 
+                               Farr_Jenkins_Paterson_R = Farr_Jenkins_Paterson_R,
+                               flesch_R = flesch_R, flesh_kincaid_R = flesh_kincaid_R,
+                               FORCAST_R = FORCAST_R, Fucks_R = Fucks_R, 
+                               FOG_R = FOG_R, Linsear_Write_R = Linsear_Write_R,
+                               nWS_R = nWS_R, SMOG_R = SMOG_R, 
+                               Strain_R = Strain_R,
+                               Wheeler_Smith_R = Wheeler_Smith_R)
+                rows_list.append(court_d)
+                break
+
+            except:
+                pass
+
+scotus_df = pd.DataFrame(rows_list)
+scotus_df.to_csv('benchmark_SCOTUS_readability.csv', index = False)
 
