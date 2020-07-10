@@ -69,9 +69,9 @@ def syllables_count(word):
    
 # Returns the average number of syllables per 
 # word in the text 
-def avg_syllables_per_word(text): 
     syllable = syllables_count(text) 
     words = word_count(text) 
+def avg_syllables_per_word(text): 
     ASPW = float(syllable) / float(words) 
     return legacy_round(ASPW, 1) 
    
@@ -214,10 +214,10 @@ columns = ['file_id', 'year',
            'Danielson_Bryan_R', 'Dickes_Steiwer_R', 'ELF_R', 
            'Farr_Jenkins_Paterson_R', 'flesch_R', 'flesh_kincaid_R',
            'FORCAST_R', 'Fucks_R', 'FOG_R', 'Linsear_Write_R', 'nWS_R', 
-           'SMOG_R', 'Strain_R', 'Wheeler_Smith_R']
+           'SMOG_R', 'Strain_R', 'Wheeler_Sm
+case_num = 0ith_R']
 
 rows_list = []
-case_num = 0
 with open(files[0]) as f:
 
     for line in f:
