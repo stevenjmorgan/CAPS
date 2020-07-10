@@ -29,7 +29,8 @@ import textstat
 import rpy2.rinterface
 from rpy2.robjects.packages import importr
 import rpy2.robjects as ro
-
+import lexnlp.extract.en.citations
+import lexnlp.nlp.en.segments.sentences
 
 # Splits the text into sentences, using  
 # Spacy's sentence segmentation which can  
@@ -236,11 +237,15 @@ with open(files[0]) as f:
             w_count = len(data['casebody']['data']['opinions'][0]['text'].split())
 
             # Remove citations from opinion text
-            
+            ## Extract citations in generator object, store in list
+            #cite_gen = lexnlp.extract.en.citations.get_citations(data['casebody']['data']['opinions'][0]['text'], return_source=True, as_dict=True)
+            #cite_list = list(cite_gen)
+            text_clean = data['casebody']['data']['opinions'][0]['text'].replace('(\d+)\s(.+?)\s(\d+)', '')
+
     
             # R-based calculations of readability
             try:
-                r_read_mets = quanteda.textstat_readability(data['casebody']['data']['opinions'][0]['text'].replace('\n', ' '), measure = 'all')
+                r_read_mets = quanteda.textstat_readability(text_clean.replace('\n', ' '), measure = 'all')
                 
                 ari_r = float(r_read_mets[1].r_repr())
                 rix_r = float(r_read_mets[35].r_repr())
