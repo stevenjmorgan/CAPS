@@ -199,6 +199,9 @@ state_high_list = ['United States Supreme Court',
                    'United State Supreme Court',
                    'Supreme Court of the United States']
 
+case_list = pd.read_csv('scotus_cases.csv', index_col=False)
+case_list = case_list['cases'].to_list()
+case_list = (list(set(case_list)))
 
 # Import quanteda from R
 quanteda = importr('quanteda')
@@ -214,8 +217,7 @@ columns = ['file_id', 'year',
            'Danielson_Bryan_R', 'Dickes_Steiwer_R', 'ELF_R', 
            'Farr_Jenkins_Paterson_R', 'flesch_R', 'flesh_kincaid_R',
            'FORCAST_R', 'Fucks_R', 'FOG_R', 'Linsear_Write_R', 'nWS_R', 
-           'SMOG_R', 'Strain_R', 'Wheeler_Sm
-case_num = 0ith_R']
+           'SMOG_R', 'Strain_R', 'Wheeler_Smith_R']
 
 rows_list = []
 with open(files[0]) as f:
@@ -223,12 +225,18 @@ with open(files[0]) as f:
     for line in f:
         
         data = json.loads(line)
-        
-        if (data['court']['name'] in state_high_list) and len(data['casebody']['data']['opinions']) > 0:
-        
+        break
+        if (data['court']['name'] in state_high_list) and len(data['casebody']['data']['opinions']) > 0 and (data['name'] in case_list):
+
+            # Remove case from case list to optimize later searches
+            case_list = [x for x in case_list if x != data['name']]
+            
             court_d = {}            
             case_year = data['decision_date'][0:4]
             w_count = len(data['casebody']['data']['opinions'][0]['text'].split())
+
+            # Remove citations from opinion text
+            
     
             # R-based calculations of readability
             try:
@@ -282,5 +290,5 @@ with open(files[0]) as f:
                 pass
 
 scotus_df = pd.DataFrame(rows_list)
-scotus_df.to_csv('benchmark_SCOTUS_readability.csv', index = False)
+scotus_df.to_csv('benchmark_SCOTUS_readability_v2.csv', index = False)
 
