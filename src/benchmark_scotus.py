@@ -29,8 +29,8 @@ import textstat
 import rpy2.rinterface
 from rpy2.robjects.packages import importr
 import rpy2.robjects as ro
-import lexnlp.extract.en.citations
-import lexnlp.nlp.en.segments.sentences
+#import lexnlp.extract.en.citations #needs to run in python 3.6
+#import lexnlp.nlp.en.segments.sentences
 
 # Splits the text into sentences, using  
 # Spacy's sentence segmentation which can  
@@ -203,6 +203,7 @@ state_high_list = ['United States Supreme Court',
 case_list = pd.read_csv('scotus_cases.csv', index_col=False)
 case_list = case_list['cases'].to_list()
 case_list = (list(set(case_list)))
+case_num = 0
 
 # Import quanteda from R
 quanteda = importr('quanteda')
@@ -226,7 +227,7 @@ with open(files[0]) as f:
     for line in f:
         
         data = json.loads(line)
-        break
+        
         if (data['court']['name'] in state_high_list) and len(data['casebody']['data']['opinions']) > 0 and (data['name'] in case_list):
 
             # Remove case from case list to optimize later searches
