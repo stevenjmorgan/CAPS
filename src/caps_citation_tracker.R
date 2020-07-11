@@ -7,5 +7,5 @@ load('firstdim.RData')
 colnames(all.courts)
 unique(all.courts$number_cites)
 
-cites <- read.csv('citations.csv/citations.csv')
+cites <- read.csv('citations.csv/citations.csv', header = F)
 head(cites)
