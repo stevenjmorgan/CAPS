@@ -170,17 +170,52 @@ merged <- merge(year.1d, byu, by = 'year', all.x = TRUE)
 
 # Group by year (median), merge in state supreme court data on year
 load('firstdim.RData')
-
-
-
+state.court.1d <- aggregate(all.courts[,c('first.dim')], 
+                     list(all.courts$year), median)
+colnames(state.court.1d) <- c('year',  'median.state')
+state.court.1d <- state.court.1d[which(state.court.1d$year>=1776),]
+dim(merged)
+dim(state.court.1d)
+merged <- merge(merged, state.court.1d, all.y = TRUE)
+dim(merged)
 
 ggplot(data=merged, aes(year)) + 
+  geom_point(aes(y=median.state, colour = 'State Courts')) +
+  geom_smooth(aes(y=median.state, colour = 'State Courts')) +
   geom_point(aes(y=median.scotus, colour = 'SCOTUS')) + ylim(-8,8) +
   geom_smooth(aes(y=median.scotus, colour = 'SCOTUS')) +
   geom_point(aes(y=median.byu, colour = 'American English Corpus')) +
   geom_smooth(aes(y=median.byu, colour = 'American English Corpus')) +
   xlab('Year') + ylab('Readability') +
-  theme_bw() + ggtitle('PCA Readability Scores by Year: US Benchmark Corpus') 
+  theme_bw() + ggtitle('Median PCA Readability Scores by Year: 
+State Supreme Court Opinions, SCOTUS Opinions, and American English Corpus') +
+  theme(legend.title = element_blank())
+ggsave('readability_three_corpora.png')
 
+# Three year moving average of median yearly values
+library(zoo)
 
+# Fill in NA values
+merged$median.byu.imp <- na.locf(merged$median.byu, na.rm = FALSE)
+merged$median.state.imp <- na.locf(merged$median.state, na.rm = FALSE)
+merged$median.scotus.imp <- na.locf(merged$median.scotus, na.rm = FALSE)
 
+rolling.averages <- merged %>%
+  select(year, state = median.state.imp, byu = median.byu.imp, scotus = median.scotus.imp) %>%
+  mutate(roll.state = rollmean(state, k = 3, fill = NA),
+         roll.byu = rollmean(byu, k = 3, fill = NA),
+         roll.scotus = rollmean(scotus, k = 3, fill = NA))
+
+# Plot 3-year rolling averages
+ggplot(data=rolling.averages, aes(year)) + 
+  geom_point(aes(y=roll.state, colour = 'State Courts')) +
+  geom_smooth(aes(y=roll.state, colour = 'State Courts')) +
+  geom_point(aes(y=roll.scotus, colour = 'SCOTUS')) + ylim(-8,8) +
+  geom_smooth(aes(y=roll.scotus, colour = 'SCOTUS')) +
+  geom_point(aes(y=roll.byu, colour = 'American English Corpus')) +
+  geom_smooth(aes(y=roll.byu, colour = 'American English Corpus')) +
+  xlab('Year') + ylab('Readability') +
+  theme_bw() + ggtitle('3-Year Rolling Averages of Median PCA Readability Scores by Year: 
+State Supreme Court Opinions, SCOTUS Opinions, and American English Corpus') +
+  theme(legend.title = element_blank())
+ggsave('rolling_averages_readability_three_corpora.png')
