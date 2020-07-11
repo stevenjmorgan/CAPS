@@ -168,6 +168,12 @@ colnames(byu) <- c('year', 'median.byu')
 colnames(year.1d) <- c('year', 'median.scotus')
 merged <- merge(year.1d, byu, by = 'year', all.x = TRUE)
 
+# Group by year (median), merge in state supreme court data on year
+load('firstdim.RData')
+
+
+
+
 ggplot(data=merged, aes(year)) + 
   geom_point(aes(y=median.scotus, colour = 'SCOTUS')) + ylim(-8,8) +
   geom_smooth(aes(y=median.scotus, colour = 'SCOTUS')) +
