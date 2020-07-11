@@ -203,3 +203,4 @@ ggplot(tgc, aes(x=decade, y=first.dim)) +
 ggsave('dec_benchmark_first_dim.png')
 #ggplot(data=all.courts[which(all.courts$state == 'Massachusetts'),], aes(x=year,y=first.dim)) + geom_point()
 
+save(year.1d, file = 'byu_read.RData')

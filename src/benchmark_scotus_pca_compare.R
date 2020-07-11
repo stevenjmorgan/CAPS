@@ -9,7 +9,7 @@ library(ggplot2)
 library(dplyr)
 library(plyr)
 
-scotus <- read.csv('benchmark_SCOTUS_readability.csv')
+scotus <- read.csv('benchmark_SCOTUS_readability_v2.csv')
 colnames(scotus)
 length(unique(scotus$cite))
 
@@ -64,7 +64,7 @@ options(scipen=999)
 ### Access PCA results
 # Eigenvalues
 eig.val <- get_eigenvalue(read.pca)
-eig.val # First dimension explains 84.8% of variance
+eig.val # First dimension explains 85.5% of variance
 
 # Results for Variables
 res.var <- get_pca_var(read.pca)
@@ -81,8 +81,8 @@ res.ind <- get_pca_ind(read.pca)
 # Pull first prin. component
 coord <- as.data.frame(res.ind$coord[,1])
 colnames(coord)[1] <- 'dim1'
-summary(coord$dim1) # median = -0.2852; mean = 0
-sd(coord$dim1) # 3.721
+summary(coord$dim1) # median = -0.2619; mean = 0
+sd(coord$dim1) # 3.813
 hist(coord$dim1)#, xlim = c(-20,15))
 hist(coord$dim1, xlim = c(-20, 20))
 
@@ -142,7 +142,7 @@ summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
   
   return(datac)
 }
-tgc <- summarySE(corpus, 
+tgc <- summarySE(scotus, 
                  measurevar="first.dim" , groupvars=c("year"))
 
 # Standard error of the mean
@@ -151,5 +151,5 @@ ggplot(tgc, aes(x=year, y=first.dim)) +
   #geom_line() +
   geom_point() + xlab('Year') + ylab('Readability') +
   theme_bw() + ggtitle('PCA Readability Scores by Year: US Benchmark Corpus')
-ggsave('year_benchmark_first_dim.png')
+ggsave('year_scotus_benchmark_first_dim.png')
 #ggplot(data=all.courts[which(all.courts$state == 'Massachusetts'),], aes(x=year,y=first.dim)) + geom_point()
