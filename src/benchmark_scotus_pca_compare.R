@@ -9,6 +9,11 @@ library(ggplot2)
 library(dplyr)
 library(plyr)
 
+# BYU data
+load('byu_read.RData')
+byu <- year.1d
+rm(year.1d)
+
 scotus <- read.csv('benchmark_SCOTUS_readability_v2.csv')
 colnames(scotus)
 length(unique(scotus$cite))
@@ -153,3 +158,23 @@ ggplot(tgc, aes(x=year, y=first.dim)) +
   theme_bw() + ggtitle('PCA Readability Scores by Year: US Benchmark Corpus')
 ggsave('year_scotus_benchmark_first_dim.png')
 #ggplot(data=all.courts[which(all.courts$state == 'Massachusetts'),], aes(x=year,y=first.dim)) + geom_point()
+
+################################################################################
+### Plot BYU and SCOTUS
+################################################################################
+# Merge BYU and SCOTUS data on year
+unique(byu$year)
+colnames(byu) <- c('year', 'median.byu')
+colnames(year.1d) <- c('year', 'median.scotus')
+merged <- merge(year.1d, byu, by = 'year', all.x = TRUE)
+
+ggplot(data=merged, aes(year)) + 
+  geom_point(aes(y=median.scotus, colour = 'SCOTUS')) + ylim(-8,8) +
+  geom_smooth(aes(y=median.scotus, colour = 'SCOTUS')) +
+  geom_point(aes(y=median.byu, colour = 'American English Corpus')) +
+  geom_smooth(aes(y=median.byu, colour = 'American English Corpus')) +
+  xlab('Year') + ylab('Readability') +
+  theme_bw() + ggtitle('PCA Readability Scores by Year: US Benchmark Corpus') 
+
+
+
