@@ -9,3 +9,5 @@ unique(all.courts$number_cites)
 
 cites <- read.csv('citations.csv/citations.csv', header = F)
 head(cites)
+
+### Clean up adjancy file -> v1 should be one plus the value above
